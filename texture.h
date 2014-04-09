@@ -1,6 +1,5 @@
 #ifndef TEXTURE_H_INCLUDED
 #define TEXTURE_H_INCLUDED
-//Class developed from LazyFoo's tutorial
 #include <SDL.h>
 #include <string>
 

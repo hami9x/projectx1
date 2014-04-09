@@ -1,6 +1,4 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2014)
-and may not be redistributed without written permission.*/
-
+/* Some of the code are originally written by LazyFoo Production. */
 //Using SDL, SDL_image, SDL_ttf, standard IO, math, and strings
 #include <SDL.h>
 #include <SDL_image.h>
