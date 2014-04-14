@@ -37,13 +37,17 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="`sdl-config --cflags`" />
 			<Add option="-Wall" />
+			<Add option="`sdl-config --cflags`" />
+			<Add directory="D:/mingw_lib/include/SDL2" />
 		</Compiler>
 		<Linker>
 			<Add option="`sdl-config --libs`" />
+			<Add option="-lmingw32 -lSDL2main -lSDL2" />
+			<Add directory="D:/mingw_lib/lib" />
 		</Linker>
 		<Unit filename="NovaSquare.ttf" />
+		<Unit filename="aircraft.gif" />
 		<Unit filename="cb.bmp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="text.cpp" />
@@ -53,6 +57,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

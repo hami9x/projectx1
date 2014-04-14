@@ -71,18 +71,19 @@ class Application {
     }
 
     void start() {
-        //Render text
-        SDL_Color Black = { 0, 0, 0 };
+        //Render aircraft
+        XxTexture aircraft;
 
-        XxText text = XxText("This game is awesome but people don't think it's awesome because \
-        it belongs to a kind of awesomeness that is not so awesome to people who are not awesome.",
-        assets.defFont(), Black);
+        aircraft.loadFromFile( mRenderer ,"aircraft.gif");
 
         //Main loop flag
         bool quit = false;
 
         //Event handler
         SDL_Event e;
+
+        //Angle of rotation
+        double degrees=0;
 
         //While application is running
         while( !quit )
@@ -95,14 +96,26 @@ class Application {
                 {
                     quit = true;
                 }
+                else if( e.type == SDL_KEYDOWN)
+                {
+                    switch( e.key.keysym.sym )
+                    {
+                        case SDLK_LEFT:
+                            degrees -= 5;
+                            break;
+                        case SDLK_RIGHT:
+                            degrees += 5;
+                            break;
+                    }
+                }
             }
 
             //Clear screen
             SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
             SDL_RenderClear( mRenderer );
 
-            //Render current frame
-            text.render(mRenderer, (SCREEN_WIDTH - text.width()) / 2, (SCREEN_HEIGHT - text.height()) / 2, 500);
+            //Render aircraft
+            aircraft.render( mRenderer,( SCREEN_WIDTH - aircraft.width() )/2,( SCREEN_HEIGHT - aircraft.height() )/2, NULL, degrees, NULL, SDL_FLIP_NONE );
 
             //Update screen
             SDL_RenderPresent(mRenderer);
