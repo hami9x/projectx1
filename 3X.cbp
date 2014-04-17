@@ -15,6 +15,7 @@
 					<Add option="-g" />
 					<Add directory="/usr/include/SDL2" />
 					<Add directory="/usr/local/include/SDL2" />
+					<Add directory="vendor" />
 				</Compiler>
 				<Linker>
 					<Add library="SDL2" />
@@ -54,6 +55,10 @@
 		<Unit filename="text.h" />
 		<Unit filename="texture.cpp" />
 		<Unit filename="texture.h" />
+		<Unit filename="vendor/tinyxml/tinyxml2.cpp" />
+		<Unit filename="vendor/tinyxml/tinyxml2.h" />
+		<Unit filename="vendor/tmxparser/src/tmxparser.cpp" />
+		<Unit filename="vendor/tmxparser/src/tmxparser.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
