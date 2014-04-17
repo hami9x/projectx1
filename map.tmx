@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="clouds" tilewidth="173" tileheight="105">
+  <image source="clouds.png" trans="ff00ff" width="694" height="424"/>
+ </tileset>
+ <tileset firstgid="17" name="aircraft" tilewidth="32" tileheight="32">
+  <image source="aircraft.png" trans="ff00ff" width="128" height="128"/>
+ </tileset>
+ <layer name="Clouds" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJzt1kENACAMBEFAAP7lYgC+vZLMKNj0cekYAABUWOkA4DuddqNTC1BrpgMudjoAiPObuAEAAAC8HDXyABo=
+  </data>
+ </layer>
+ <layer name="plane" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztzrcJwEAABEG1IO9N/1XqatAHj2AGNt+mAQAA+J82dalPQ+WXEmOa0pyWyi8l1rSlPR2VX0qc6Up3euquAAAAAAAAH7xOCgGJ
+  </data>
+ </layer>
+ <objectgroup name="plane" width="50" height="50">
+  <object x="668" y="528">
+   <polygon points="0,0 -16,1 -2,5 -5,18 -10,21 -55,24 -55,46 -6,54 -4,73 -24,80 -23,94 1,93 2,98 5,98 7,93 32,92 31,80 13,72 14,55 61,44 65,37 65,26 60,25 18,21 13,18 12,4 22,1 8,0 4,-4"/>
+  </object>
+ </objectgroup>
+ <objectgroup name="clouds" width="50" height="50">
+  <object x="572" y="682">
+   <polygon points="0,0 24,-8 32,-8 36,-2 68,-7 86,-4 99,-8 130,0 140,16 137,39 123,55 100,63 88,62 74,62 69,60 59,61 56,60 47,65 35,63 23,68 -1,54 -17,30 -15,16"/>
+  </object>
+  <object x="376" y="523">
+   <polygon points="0,0 24,-8 32,-8 36,-2 68,-7 86,-4 99,-8 130,0 140,16 137,39 123,55 100,63 88,62 74,62 69,60 59,61 56,60 47,65 35,63 23,68 -1,54 -17,30 -15,16"/>
+  </object>
+  <object x="217" y="331">
+   <polygon points="0,0 24,-8 32,-8 36,-2 68,-7 86,-4 99,-8 130,0 140,16 137,39 123,55 100,63 88,62 74,62 69,60 59,61 56,60 47,65 35,63 23,68 -1,54 -17,30 -15,16"/>
+  </object>
+  <object x="149" y="715">
+   <polygon points="0,0 24,-8 32,-8 36,-2 68,-7 86,-4 99,-8 130,0 140,16 137,39 123,55 100,63 88,62 74,62 69,60 59,61 56,60 47,65 35,63 23,68 -1,54 -17,30 -15,16"/>
+  </object>
+  <object x="891" y="907">
+   <polygon points="0,0 24,-8 32,-8 36,-2 68,-7 86,-4 99,-8 130,0 140,16 137,39 123,55 100,63 88,62 74,62 69,60 59,61 56,60 47,65 35,63 23,68 -1,54 -17,30 -15,16"/>
+  </object>
+  <object x="859" y="492">
+   <polygon points="0,0 24,-8 32,-8 36,-2 68,-7 86,-4 99,-8 130,0 140,16 137,39 123,55 100,63 88,62 74,62 69,60 59,61 56,60 47,65 35,63 23,68 -1,54 -17,30 -15,16"/>
+  </object>
+  <object x="407" y="876">
+   <polygon points="0,0 24,-8 32,-8 36,-2 68,-7 86,-4 99,-8 130,0 140,16 137,39 123,55 100,63 88,62 74,62 69,60 59,61 56,60 47,65 35,63 23,68 -1,54 -17,30 -15,16"/>
+  </object>
+ </objectgroup>
+</map>
