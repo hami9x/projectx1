@@ -49,8 +49,11 @@
 		</Linker>
 		<Unit filename="NovaSquare.ttf" />
 		<Unit filename="aircraft.gif" />
+		<Unit filename="aircraft.png" />
 		<Unit filename="cb.bmp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="player.cpp" />
+		<Unit filename="player.h" />
 		<Unit filename="text.cpp" />
 		<Unit filename="text.h" />
 		<Unit filename="texture.cpp" />

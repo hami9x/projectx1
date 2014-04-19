@@ -9,6 +9,7 @@
 
 #include "text.h"
 #include "texture.h"
+#include "player.h"
 
 using namespace std;
 
@@ -71,10 +72,11 @@ class Application {
     }
 
     void start() {
-        //Render aircraft
-        XxTexture aircraft;
+        //set player1
+        XxPlayer player1;
 
-        aircraft.loadFromFile( mRenderer ,"aircraft.gif");
+        player1.getAvatar( mRenderer ,"aircraft.png");
+        player1.getScreenSize(SCREEN_HEIGHT, SCREEN_WIDTH);
 
         //Main loop flag
         bool quit = false;
@@ -82,12 +84,10 @@ class Application {
         //Event handler
         SDL_Event e;
 
-        //Angle of rotation
-        double degrees=0;
-
         //While application is running
         while( !quit )
         {
+
             //Handle events on queue
             while( SDL_PollEvent( &e ) != 0 )
             {
@@ -96,27 +96,28 @@ class Application {
                 {
                     quit = true;
                 }
-                else if( e.type == SDL_KEYDOWN)
+                else
                 {
-                    switch( e.key.keysym.sym )
-                    {
-                        case SDLK_LEFT:
-                            degrees -= 5;
-                            break;
-                        case SDLK_RIGHT:
-                            degrees += 5;
-                            break;
-                    }
+                    player1.handleEvent(e);
                 }
+
             }
+
+            //Move the aircraft
+            player1.fly();
+
+            //Check off screen and move cursor to center
+            int x,y;
+            SDL_GetMouseState(&x,&y);
+            if ( x == 0 || y == 0 || x == SCREEN_WIDTH -1 || y == SCREEN_HEIGHT -1)
+                SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2 , SCREEN_HEIGHT /2);
 
             //Clear screen
             SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
             SDL_RenderClear( mRenderer );
 
             //Render aircraft
-            aircraft.render( mRenderer,( SCREEN_WIDTH - aircraft.width() )/2,( SCREEN_HEIGHT - aircraft.height() )/2, NULL, degrees, NULL, SDL_FLIP_NONE );
-
+            player1.render(mRenderer);
             //Update screen
             SDL_RenderPresent(mRenderer);
         }
@@ -221,6 +222,8 @@ int main( int argc, char* args[] )
 		return 1;
 	}
 
+    //Hide cursor
+    SDL_ShowCursor(0);
     app.start();
 
 	return 0;
