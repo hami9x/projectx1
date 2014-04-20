@@ -93,6 +93,9 @@ class Application {
         clImg.loadFromFile(mRenderer, "clouds.png");
         EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, true);
         Entity::addAll(clouds, space);
+        //Trap mouse to screen center
+        SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
         //set player1
         Player player1;
 
@@ -131,12 +134,6 @@ class Application {
 
             //Move the aircraft
             player1.fly();
-
-            //Check off screen and move cursor to center
-            int x,y;
-            SDL_GetMouseState(&x,&y);
-            if ( x == 0 || y == 0 || x == SCREEN_WIDTH -1 || y == SCREEN_HEIGHT -1)
-                SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2 , SCREEN_HEIGHT /2);
 
             //Clear screen
             SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
