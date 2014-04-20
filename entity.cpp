@@ -10,16 +10,6 @@ using namespace tmxparser;
 
 namespace xx {
 
-//EntityCollection::EntityCollection(Sprite *spr, vector<Entity*> ents) {
-//    sprite = spr;
-//    entities = ents;
-//}
-//
-//EntityCollection::~EntityCollection() {
-//    delete[] sprite;
-//    delete[] entities;
-//}
-
 Sprite::Sprite() {
     SDL_Rect r = {0, 0, 0, 0};
     mImage = NULL;

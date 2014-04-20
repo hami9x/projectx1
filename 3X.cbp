@@ -56,6 +56,8 @@
 			<Option weight="100" />
 		</Unit>
 		<Unit filename="map.tmx" />
+		<Unit filename="player.cpp" />
+		<Unit filename="player.h" />
 		<Unit filename="text.cpp">
 			<Option weight="74" />
 		</Unit>
