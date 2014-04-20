@@ -9,22 +9,26 @@
 
 using namespace std;
 
-class XxText {
-    XxTexture mTexture;
-    SDL_Renderer *mRenderer;
-    TTF_Font *mFont;
-    SDL_Color mColor;
-    int mWrapWidth;
-    string mText;
+namespace xx {
 
-    public:
-    XxText(string, TTF_Font*, SDL_Color);
-    ~XxText();
+    class Text {
+        Texture mTexture;
+        SDL_Renderer *mRenderer;
+        TTF_Font *mFont;
+        SDL_Color mColor;
+        int mWrapWidth;
+        string mText;
 
-    int width();
-    int height();
+        public:
+        Text(string, TTF_Font*, SDL_Color);
+        ~Text();
 
-    bool render(SDL_Renderer *r, int x, int y, int wrapWidth);
-};
+        int width();
+        int height();
+
+        void render(SDL_Renderer *r, int x, int y, int wrapWidth);
+    };
+
+}
 
 #endif // TEXT_H_INCLUDED

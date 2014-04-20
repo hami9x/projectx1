@@ -13,16 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
-					<Add directory="/usr/include/SDL2" />
-					<Add directory="/usr/local/include/SDL2" />
-					<Add directory="vendor" />
 				</Compiler>
-				<Linker>
-					<Add library="SDL2" />
-					<Add library="SDL2_ttf" />
-					<Add library="SDL2_image" />
-					<Add directory="/usr/local/lib" />
-				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/3X" prefix_auto="1" extension_auto="1" />
@@ -32,30 +23,50 @@
 				<Compiler>
 					<Add option="-O2" />
 				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 			<Add option="`sdl-config --cflags`" />
 			<Add directory="D:/mingw_lib/include/SDL2" />
+			<Add directory="vendor/tinyxml" />
+			<Add directory="vendor/tmxparser/src" />
+			<Add directory="D:/vendor/SDL2-2.0.3/include" />
+			<Add directory="D:/vendor/Chipmunk-6.2.1/include/chipmunk" />
+			<Add directory="D:/vendor/SDL2_image-2.0.0/x86_64-w64-mingw32/include/SDL2" />
+			<Add directory="D:/vendor/SDL2_ttf-2.0.12/x86_64-w64-mingw32/include/SDL2" />
 		</Compiler>
 		<Linker>
-			<Add option="`sdl-config --libs`" />
-			<Add option="-lmingw32 -lSDL2main -lSDL2" />
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
+			<Add option="-lchipmunk" />
 			<Add directory="D:/mingw_lib/lib" />
+			<Add directory="D:/vendor/SDL2-2.0.3/i686-w64-mingw32/lib" />
+			<Add directory="D:/vendor/Chipmunk-6.2.1/msvc/vc10/chipmunk/Win32/Debug DLL" />
+			<Add directory="D:/vendor/SDL2_image-2.0.0/i686-w64-mingw32/lib" />
+			<Add directory="D:/vendor/SDL2_ttf-2.0.12/i686-w64-mingw32/lib" />
 		</Linker>
 		<Unit filename="NovaSquare.ttf" />
 		<Unit filename="aircraft.gif" />
+		<Unit filename="aircraft.png" />
 		<Unit filename="cb.bmp" />
-		<Unit filename="main.cpp" />
-		<Unit filename="text.cpp" />
+		<Unit filename="entity.cpp" />
+		<Unit filename="entity.h" />
+		<Unit filename="main.cpp">
+			<Option weight="100" />
+		</Unit>
+		<Unit filename="map.tmx" />
+		<Unit filename="text.cpp">
+			<Option weight="74" />
+		</Unit>
 		<Unit filename="text.h" />
-		<Unit filename="texture.cpp" />
+		<Unit filename="texture.cpp">
+			<Option weight="59" />
+		</Unit>
 		<Unit filename="texture.h" />
-		<Unit filename="vendor/tinyxml/tinyxml2.cpp" />
+		<Unit filename="vendor/tinyxml/tinyxml2.cpp">
+			<Option weight="59" />
+		</Unit>
 		<Unit filename="vendor/tinyxml/tinyxml2.h" />
 		<Unit filename="vendor/tmxparser/src/tmxparser.cpp" />
 		<Unit filename="vendor/tmxparser/src/tmxparser.h" />

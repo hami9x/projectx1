@@ -6,15 +6,15 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include "tmxparser.h"
 
 #include "text.h"
 #include "texture.h"
+#include "entity.h"
 
 using namespace std;
-
-//Screen dimension constants
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
+using namespace tmxparser;
+using namespace xx;
 
 //Class to manage asset objects
 class Assets {
@@ -71,10 +71,29 @@ class Application {
     }
 
     void start() {
-        //Render aircraft
-        XxTexture aircraft;
+        // cpVect is a 2D vector and cpv() is a shortcut for initializing them.
+        cpVect gravity = cpv(0, 10);
 
-        aircraft.loadFromFile( mRenderer ,"aircraft.gif");
+        // Create an empty space.
+        cpSpace *space = cpSpaceNew();
+        cpSpaceSetGravity(space, gravity);
+        //Render aircraft
+        Texture aircraft;
+
+        aircraft.loadFromFile(mRenderer, "aircraft.gif");
+        TmxMap m;
+        TmxReturn error = tmxparser::parseFromFile("map.tmx", &m);
+        if (error != TmxReturn::kSuccess) {
+            printf("Tmx parse error. Code %d.\n", error);
+        }
+        Texture plImg;
+        plImg.loadFromFile(mRenderer, "aircraft.png");
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, true);
+        Entity::addAll(players, space);
+        Texture clImg;
+        clImg.loadFromFile(mRenderer, "clouds.png");
+        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, true);
+        Entity::addAll(clouds, space);
 
         //Main loop flag
         bool quit = false;
@@ -85,6 +104,7 @@ class Application {
         //Angle of rotation
         double degrees=0;
 
+        cpFloat timeStep = 1.0/60.0;
         //While application is running
         while( !quit )
         {
@@ -116,10 +136,14 @@ class Application {
 
             //Render aircraft
             aircraft.render( mRenderer,( SCREEN_WIDTH - aircraft.width() )/2,( SCREEN_HEIGHT - aircraft.height() )/2, NULL, degrees, NULL, SDL_FLIP_NONE );
+            Entity::renderAll(players, mRenderer);
+            Entity::renderAll(clouds, mRenderer);
 
             //Update screen
             SDL_RenderPresent(mRenderer);
+            cpSpaceStep(space, timeStep);
         }
+        cpSpaceFree(space);
     }
 
     bool loadExtensions()

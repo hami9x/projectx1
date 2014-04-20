@@ -3,48 +3,51 @@
 #include <SDL.h>
 #include <string>
 
-//Texture wrapper class
-class XxTexture
-{
-	public:
-		//Initializes variables
-		XxTexture();
+namespace xx {
 
-		//Deallocates memory
-		~XxTexture();
+    //Texture wrapper class
+    class Texture
+    {
+        public:
+            //Initializes variables
+            Texture();
 
-		//Loads image at specified path
-		bool loadFromFile( SDL_Renderer *r, std::string path );
+            //Deallocates memory
+            ~Texture();
 
-		//Deallocates texture
-		void free();
+            //Loads image at specified path
+            bool loadFromFile( SDL_Renderer *r, std::string path );
 
-		//Set color modulation
-		void setColor( Uint8 red, Uint8 green, Uint8 blue );
+            //Deallocates texture
+            void free();
 
-		//Set blending
-		void setBlendMode( SDL_BlendMode blending );
+            //Set color modulation
+            void setColor( Uint8 red, Uint8 green, Uint8 blue );
 
-		//Set alpha modulation
-		void setAlpha( Uint8 alpha );
+            //Set blending
+            void setBlendMode( SDL_BlendMode blending );
 
-		//Renders texture at given point
-		void render( SDL_Renderer *r, int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
+            //Set alpha modulation
+            void setAlpha( Uint8 alpha );
 
-		bool updateSurface(SDL_Renderer *r, SDL_Surface* surface);
+            //Renders texture at given point
+            void render( SDL_Renderer *r, int x, int y, SDL_Rect* clip = NULL, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
 
-		//Gets image dimensions
-		int width();
-		int height();
+            bool updateSurface(SDL_Renderer *r, SDL_Surface* surface);
 
-	private:
-		//The actual hardware texture
-		SDL_Texture* mTexture;
+            //Gets image dimensions
+            int width();
+            int height();
 
-		//Image dimensions
-		int mWidth;
-		int mHeight;
-		SDL_Renderer *mRenderer;
-};
+        private:
+            //The actual hardware texture
+            SDL_Texture* mTexture;
+
+            //Image dimensions
+            int mWidth;
+            int mHeight;
+            SDL_Renderer *mRenderer;
+    };
+}
 
 #endif // TEXTURE_H_INCLUDED

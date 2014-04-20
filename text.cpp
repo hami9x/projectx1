@@ -1,8 +1,9 @@
+#include <cassert>
 #include "text.h"
 
-#include <cassert>
+namespace xx {
 
-XxText::XxText(string text, TTF_Font *font, SDL_Color color) {
+Text::Text(string text, TTF_Font *font, SDL_Color color) {
     assert(font != NULL);
 
     mRenderer = NULL;
@@ -12,7 +13,7 @@ XxText::XxText(string text, TTF_Font *font, SDL_Color color) {
     mWrapWidth = -1;
 }
 
-bool XxText::render(SDL_Renderer *r, int x, int y, int wrapWidth)
+void Text::render(SDL_Renderer *r, int x, int y, int wrapWidth)
 {
     assert(wrapWidth > 0);
     if (mRenderer != r || mWrapWidth != wrapWidth)
@@ -27,16 +28,18 @@ bool XxText::render(SDL_Renderer *r, int x, int y, int wrapWidth)
     mTexture.render(mRenderer, x, y);
 }
 
-XxText::~XxText() {
+Text::~Text() {
     mTexture.free();
 }
 
-int XxText::width()
+int Text::width()
 {
 	return mTexture.width();
 }
 
-int XxText::height()
+int Text::height()
 {
 	return mTexture.width();
+}
+
 }

@@ -5,7 +5,9 @@
 #include <cassert>
 #include <stdio.h>
 
-XxTexture::XxTexture()
+namespace xx {
+
+Texture::Texture()
 {
 	//Initialize
 	mTexture = NULL;
@@ -13,13 +15,13 @@ XxTexture::XxTexture()
 	mHeight = 0;
 }
 
-XxTexture::~XxTexture()
+Texture::~Texture()
 {
 	//Deallocate
 	free();
 }
 
-bool XxTexture::loadFromFile(SDL_Renderer *r, std::string path )
+bool Texture::loadFromFile(SDL_Renderer *r, std::string path )
 {
 	//Get rid of preexisting texture
 	free();
@@ -60,7 +62,7 @@ bool XxTexture::loadFromFile(SDL_Renderer *r, std::string path )
 	return mTexture != NULL;
 }
 
-void XxTexture::free()
+void Texture::free()
 {
 	//Free texture if it exists
 	if( mTexture != NULL )
@@ -72,25 +74,25 @@ void XxTexture::free()
 	}
 }
 
-void XxTexture::setColor( Uint8 red, Uint8 green, Uint8 blue )
+void Texture::setColor( Uint8 red, Uint8 green, Uint8 blue )
 {
 	//Modulate texture rgb
 	SDL_SetTextureColorMod( mTexture, red, green, blue );
 }
 
-void XxTexture::setBlendMode( SDL_BlendMode blending )
+void Texture::setBlendMode( SDL_BlendMode blending )
 {
 	//Set blending function
 	SDL_SetTextureBlendMode( mTexture, blending );
 }
 
-void XxTexture::setAlpha( Uint8 alpha )
+void Texture::setAlpha( Uint8 alpha )
 {
 	//Modulate texture alpha
 	SDL_SetTextureAlphaMod( mTexture, alpha );
 }
 
-void XxTexture::render( SDL_Renderer *r, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
+void Texture::render( SDL_Renderer *r, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
@@ -106,7 +108,7 @@ void XxTexture::render( SDL_Renderer *r, int x, int y, SDL_Rect* clip, double an
 	SDL_RenderCopyEx( r, mTexture, clip, &renderQuad, angle, center, flip );
 }
 
-bool XxTexture::updateSurface(SDL_Renderer *r, SDL_Surface* surface)
+bool Texture::updateSurface(SDL_Renderer *r, SDL_Surface* surface)
 {
     //Get rid of preexisting texture
 	free();
@@ -130,12 +132,14 @@ bool XxTexture::updateSurface(SDL_Renderer *r, SDL_Surface* surface)
 	return true;
 }
 
-int XxTexture::width()
+int Texture::width()
 {
 	return mWidth;
 }
 
-int XxTexture::height()
+int Texture::height()
 {
 	return mHeight;
+}
+
 }
