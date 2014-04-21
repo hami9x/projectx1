@@ -3,6 +3,7 @@
 #include <sdl.h>
 #include <cmath>
 #include <malloc.h>
+#include "global.h"
 #include "entity.h"
 
 using namespace std;
@@ -46,7 +47,6 @@ cpVect toScreenCoord(TmxMap *m, cpVect v) {
     cpVect rv;
     rv.x = int((double)v.x / mw * SCREEN_WIDTH);
     rv.y = int((double)v.y / mh * SCREEN_HEIGHT);
-    printf("tssc: %f %f\n", rv.x, rv.y);
     return rv;
 }
 
@@ -61,7 +61,6 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 int th = ts.tileHeight;
                 int ncols = ts.image.width/tw;
                 SDL_Rect area = {(tileid%ncols)*tw, (int(ceil((double)(tileid+1)/ncols))-1)*th, tw, th};
-                printf("%d %d %d %d:::\n", area.x, area.y, tw, th);
 
                 sprite = Sprite(image, area);
                 break;

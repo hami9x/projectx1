@@ -8,6 +8,7 @@
 #include <cmath>
 #include "tmxparser.h"
 
+#include "global.h"
 #include "text.h"
 #include "texture.h"
 #include "entity.h"
@@ -73,11 +74,12 @@ class Application {
 
     void start() {
         // cpVect is a 2D vector and cpv() is a shortcut for initializing them.
-        cpVect gravity = cpv(0, 10);
+        cpVect gravity = cpv(0, 0);
 
         // Create an empty space.
         cpSpace *space = cpSpaceNew();
         cpSpaceSetGravity(space, gravity);
+        cpSpaceSetDamping(space, 0.5);
 
         TmxMap m;
         TmxReturn error = tmxparser::parseFromFile("map.tmx", &m);
@@ -97,19 +99,13 @@ class Application {
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
         //set player1
-        Player player1;
-
-        player1.getAvatar( mRenderer ,"aircraft.png");
-        player1.getScreenSize(SCREEN_HEIGHT, SCREEN_WIDTH);
+        Player p1(players[0]);
 
         //Main loop flag
         bool quit = false;
 
         //Event handler
         SDL_Event e;
-
-        //Angle of rotation
-        double degrees=0;
 
         cpFloat timeStep = 1.0/60.0;
 
@@ -127,13 +123,13 @@ class Application {
                 }
                 else
                 {
-                    player1.handleEvent(e);
+                    p1.handleEvent(e);
                 }
 
             }
 
             //Move the aircraft
-            player1.fly();
+            p1.fly();
 
             //Clear screen
             SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -142,7 +138,7 @@ class Application {
             //Render aircraft
             Entity::renderAll(players, mRenderer);
             Entity::renderAll(clouds, mRenderer);
-            player1.render(mRenderer);
+            p1.render(mRenderer);
             //Update screen
             SDL_RenderPresent(mRenderer);
             cpSpaceStep(space, timeStep);

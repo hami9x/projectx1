@@ -1,117 +1,83 @@
 #include "player.h"
+
 #include <SDL.h>
-#include "texture.h"
 #include <stdio.h>
 #include <cmath>
 
+#include "texture.h"
+
 namespace xx {
 
-Player::Player()
-{
+Player::Player(Entity * e) {
+    mEntity=e;
     //Initialize
-    mPosX=0;
-    mPosY=0;
     mVelX=0;
     mVelY=0;
-    press=false;
+    pressed=false;
     rdegrees=0;
     mdegrees=90;
 }
 
-Player::~Player()
-{
+Player::~Player() {
 }
 
-void Player::getAvatar(SDL_Renderer *r,char s[])
-{
-    aircraft.loadFromFile(r,s);
+void Player::render(SDL_Renderer *r) {
 
+    mEntity->render(r);
 }
 
-void Player::render(SDL_Renderer *r)
-{
-    aircraft.render(r, mPosX, mPosY, NULL, rdegrees, NULL, SDL_FLIP_NONE);
+cpFloat angleAdd(cpFloat angle, cpFloat delta) {
+    angle += delta;
+    if (angle >= 360) {
+        angle -= 360;
+    }
+    if (angle < 0) {
+        angle += 360;
+    }
+    return angle;
 }
 
-void Player::handleEvent(SDL_Event e)
-{
+void Player::handleEvent(SDL_Event e) {
     //Rotation
-    if( e.type == SDL_MOUSEMOTION)
-    {
+    if( e.type == SDL_MOUSEMOTION) {
         int x,y;
         SDL_GetRelativeMouseState(&x,&y);
         if( x<-1 )
-            left();
+            rotLeft();
         if( x>1 )
-            right();
+            rotRight();
     }
-    //If right button was pressed
-    if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT )
-        press=true;
-    //if right button was released
-    else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT )
-        {
-            press=false;
+    //If the button was pressed
+    if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT ) {
+        pressed=true;
+    } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT ) {
+            pressed=false;
             mVelX=0;
             mVelY=0;
-        }
-    //if holding right button
-    if (press)
-    {
-        mVelY=-sin(mdegrees*PI/180)*PLAYER_VEL;
-        mVelX=cos(mdegrees*PI/180)*PLAYER_VEL;
+    }
+    //if holding the button
+    if (pressed) {
+        printf("%f\n", cpBodyGetAngle(mEntity->body()));
+        mVelX=-sin(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
+        mVelY=-sin(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
     }
 }
 
-void Player::left()
-{
-    rdegrees -= PLAYER_RAD;
-    if(rdegrees<-360)
-        rdegrees+=360;
-
-    mdegrees += PLAYER_RAD;
-    if ( mdegrees > 360 )
-        mdegrees -= 360;
+void Player::rotLeft() {
+    cpFloat angle = cpBodyGetAngle(mEntity->body());
+    angle = angleAdd(angle, -PLAYER_RAD);
+    cpBodySetAngle(mEntity->body(), angle);
 }
 
-void Player::right()
-{
-    rdegrees += PLAYER_RAD;
-    if (rdegrees>360)
-        rdegrees -=360;
-
-    mdegrees -= PLAYER_RAD;
-    if ( mdegrees < 0 )
-        mdegrees += 360;
+void Player::rotRight() {
+    cpFloat angle = cpBodyGetAngle(mEntity->body());
+    angle = angleAdd(angle, PLAYER_RAD);
+    cpBodySetAngle(mEntity->body(), angle);
 }
 
-void Player::fly()
-{
+void Player::fly() {
     //Move the aircraft left or right
-    mPosX += round(mVelX);
-
-    //went too far to the left
-    if ( mPosX + aircraft.width() < 0 )
-        mPosX = sWidth;
-    //went too far to the right
-    if ( mPosX > sWidth )
-        mPosX = -aircraft.width();
-
-    //Move the aircraft up or down
-    mPosY += round(mVelY);
-
-    //went too far up
-    if ( mPosY + aircraft.height() < 0 )
-        mPosY = sHeight;
-    //went too far down
-    if ( mPosY > sHeight )
-        mPosY = -aircraft.height();
-}
-
-void Player::getScreenSize(int a, int b)
-{
-    sHeight=a;
-    sWidth=b;
+    cpBodyApplyImpulse(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
 }
 
 }

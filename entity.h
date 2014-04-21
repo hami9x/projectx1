@@ -2,13 +2,10 @@
 #define ENTITY_H_INCLUDED
 #include <chipmunk.h>
 #include "texture.h"
+#include "tmxparser.h"
 
 using namespace std;
 using namespace tmxparser;
-
-//Screen dimension constants
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 702;
 
 namespace xx {
 
