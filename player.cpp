@@ -14,8 +14,6 @@ Player::Player(Entity * e) {
     mVelX=0;
     mVelY=0;
     pressed=false;
-    rdegrees=0;
-    mdegrees=90;
 }
 
 Player::~Player() {
@@ -34,6 +32,7 @@ cpFloat angleAdd(cpFloat angle, cpFloat delta) {
     if (angle < 0) {
         angle += 360;
     }
+    printf("%f\n",angle);
     return angle;
 }
 
@@ -57,9 +56,8 @@ void Player::handleEvent(SDL_Event e) {
     }
     //if holding the button
     if (pressed) {
-        printf("%f\n", cpBodyGetAngle(mEntity->body()));
-        mVelX=-sin(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
-        mVelY=-sin(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
+        mVelX=sin(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
+        mVelY=-cos(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
     }
 }
 

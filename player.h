@@ -37,12 +37,6 @@ class Player {
         //Velocity of player
         double mVelX, mVelY;
 
-        //Angle use for rotation
-        double rdegrees;
-
-        //Angle use for calculate velocity
-        double mdegrees;
-
         //Entity
         Entity *mEntity;
 
