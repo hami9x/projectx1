@@ -62,6 +62,34 @@ class Application {
     Assets assets;
 
     public:
+    void drawHp1(int hp, int maxhp){
+    SDL_Rect fillRect = { 0, 0, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 20 };
+    SDL_SetRenderDrawColor( mRenderer, 0x99,0x33,0x66, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { 4, 4, SCREEN_WIDTH / 3 - 8, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { 4, 4, (SCREEN_WIDTH/3 - 8)*(double)hp/maxhp, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+
+}
+    void drawHp2(int hp, int maxhp){
+    SDL_Rect fillRect = { SCREEN_WIDTH / 1.5, 0, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 20 };
+    SDL_SetRenderDrawColor( mRenderer, 0x99,0x33,0x66, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { SCREEN_WIDTH / 1.5 + 4, 4, SCREEN_WIDTH / 3 - 8, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { SCREEN_WIDTH / 1.5 + 4, 4, (SCREEN_WIDTH/3 - 8)*(double)hp/maxhp, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+}
 
     Application(): mWindow(NULL), mRenderer(NULL)
     {
@@ -75,7 +103,6 @@ class Application {
     void start() {
         // cpVect is a 2D vector and cpv() is a shortcut for initializing them.
         cpVect gravity = cpv(0, 0);
-
         // Create an empty space.
         cpSpace *space = cpSpaceNew();
         cpSpaceSetGravity(space, gravity);
@@ -128,6 +155,7 @@ class Application {
 
             }
 
+
             //Move the aircraft
             p1.fly();
 
@@ -139,6 +167,9 @@ class Application {
             Entity::renderAll(players, mRenderer);
             Entity::renderAll(clouds, mRenderer);
             p1.render(mRenderer);
+
+            drawHp1(23,100);
+            drawHp2(68,100);
             //Update screen
             SDL_RenderPresent(mRenderer);
             cpSpaceStep(space, timeStep);
