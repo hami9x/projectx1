@@ -38,9 +38,8 @@ class Player {
         int hp;
         int maxhp;
 
-        //HPbar player1 and player2
-        void drawHp1(SDL_Renderer* mRenderer);
-        void drawHp2(SDL_Renderer* mRenderer);
+        //DRAW HPBAR
+        void drawHp(SDL_Renderer* mRenderer,int x,int y);
 
     private:
         //Velocity of player

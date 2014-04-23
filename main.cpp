@@ -140,8 +140,8 @@ class Application {
 
             //Add HPbar
             p1.hp=23; p1.maxhp=100;
-            p1.drawHp1(mRenderer);
-            p1.drawHp2(mRenderer);
+            p1.drawHp(mRenderer,0,0);
+            p1.drawHp(mRenderer,666,0);
             //Update screen
             SDL_RenderPresent(mRenderer);
             cpSpaceStep(space, timeStep);
