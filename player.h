@@ -33,6 +33,15 @@ class Player {
         //Move the aircraft
         void fly();
 
+
+        //HP
+        int hp;
+        int maxhp;
+
+        //HPbar player1 and player2
+        void drawHp1(SDL_Renderer* mRenderer);
+        void drawHp2(SDL_Renderer* mRenderer);
+
     private:
         //Velocity of player
         double mVelX, mVelY;

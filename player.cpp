@@ -3,7 +3,8 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <cmath>
-
+#include <string>
+#include "text.h"
 #include "texture.h"
 
 namespace xx {
@@ -76,6 +77,51 @@ void Player::rotRight() {
 void Player::fly() {
     //Move the aircraft left or right
     cpBodyApplyImpulse(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
+}
+
+void Player::drawHp1(SDL_Renderer* mRenderer){
+    char num[100]="HP: ",temp[100]="";
+    SDL_Rect fillRect = { 0, 0, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 20 };
+    SDL_SetRenderDrawColor( mRenderer, 0x99,0x33,0x66, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { 4, 4, SCREEN_WIDTH / 3 - 8, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { 4, 4, (SCREEN_WIDTH/3 - 8)*(double)hp/maxhp, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+    sprintf(temp,"%d",hp);
+    strcat(num,temp);
+    strcat(num,"/");
+    sprintf(temp,"%d",maxhp);
+    strcat(num,temp);
+    Text hptxt(num,TTF_OpenFont( "BKANT.ttf", 20 ), {94,19,83});
+    hptxt.render(mRenderer,10,35,200);
+    //SDL_RenderPresent(mRenderer);
+}
+void Player::drawHp2(SDL_Renderer* mRenderer){
+    char num[100]="HP: ",temp[100]="";
+    SDL_Rect fillRect = { SCREEN_WIDTH / 1.5, 0, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 20 };
+    SDL_SetRenderDrawColor( mRenderer, 0x99,0x33,0x66, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { SCREEN_WIDTH / 1.5 + 4, 4, SCREEN_WIDTH / 3 - 8, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { SCREEN_WIDTH / 1.5 + 4, 4, (SCREEN_WIDTH/3 - 8)*(double)hp/maxhp, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+    sprintf(temp,"%d",hp);
+    strcat(num,temp);
+    strcat(num,"/");
+    sprintf(temp,"%d",maxhp);
+    strcat(num,temp);
+    Text hptxt(num,TTF_OpenFont( "BKANT.ttf", 20 ), {94,19,83});
+    hptxt.render(mRenderer,676,35,200);
+    //SDL_RenderPresent(mRenderer);
 }
 
 }
