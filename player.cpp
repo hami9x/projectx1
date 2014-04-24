@@ -6,6 +6,7 @@
 #include <string>
 #include "text.h"
 #include "texture.h"
+#include "bullet.h"
 
 namespace xx {
 
@@ -14,7 +15,8 @@ Player::Player(Entity * e) {
     //Initialize
     mVelX=0;
     mVelY=0;
-    pressed=false;
+    Rpressed=false;
+    Lpressed=false;
 }
 
 Player::~Player() {
@@ -23,6 +25,9 @@ Player::~Player() {
 void Player::render(SDL_Renderer *r) {
 
     mEntity->render(r);
+    if( ammo[0].checkExist() ){
+        ammo[0].render(r);
+    }
 }
 
 cpFloat angleAdd(cpFloat angle, cpFloat delta) {
@@ -33,11 +38,10 @@ cpFloat angleAdd(cpFloat angle, cpFloat delta) {
     if (angle < 0) {
         angle += 360;
     }
-    printf("%f\n",angle);
     return angle;
 }
 
-void Player::handleEvent(SDL_Event e) {
+void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
     //Rotation
     if( e.type == SDL_MOUSEMOTION) {
         int x,y;
@@ -47,36 +51,60 @@ void Player::handleEvent(SDL_Event e) {
         if( x>1 )
             rotRight();
     }
-    //If the button was pressed
+    //If the right button was pressed
     if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT ) {
-        pressed=true;
+        Rpressed = true;
     } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT ) {
-            pressed=false;
-            mVelX=0;
-            mVelY=0;
+            Rpressed = false;
+            mVelX = 0;
+            mVelY = 0;
     }
     //if holding the button
-    if (pressed) {
+    if (Rpressed) {
         mVelX=sin(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
         mVelY=-cos(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
+    }
+    //If the left button was pressed
+    if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT ) {
+        Lpressed = true;
+        ammo[0].getPlayerPos( mEntity->body()->p.x + mEntity->sprite().width()/2, mEntity->body()->p.y + mEntity->sprite().height()/2, mAngle );
+        ammo[0].createBullet(r, space, 100);
+        int tVelX,tVelY;
+        tVelX=sin(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
+        tVelY=-cos(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
+        ammo[0].getPlayerVel(tVelX, tVelY);
     }
 }
 
 void Player::rotLeft() {
     cpFloat angle = cpBodyGetAngle(mEntity->body());
     angle = angleAdd(angle, -PLAYER_RAD);
+    mAngle = angle;
     cpBodySetAngle(mEntity->body(), angle);
 }
 
 void Player::rotRight() {
     cpFloat angle = cpBodyGetAngle(mEntity->body());
     angle = angleAdd(angle, PLAYER_RAD);
+    mAngle = angle;
     cpBodySetAngle(mEntity->body(), angle);
 }
 
 void Player::fly() {
-    //Move the aircraft left or right
+    //Apply impulse
     cpBodyApplyImpulse(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
+    if(ammo[0].checkExist())
+        ammo[0].moveBullet();
+    cpBody *body = mEntity->body();
+    //Move around screen
+    if( body->p.x > SCREEN_WIDTH )
+        body->p.x = -mEntity->width();
+    if( body->p.x < -mEntity->width() )
+        body->p.x = SCREEN_WIDTH;
+    if( body->p.y > SCREEN_HEIGHT )
+        body->p.y = -mEntity->height();
+    if( body->p.y < -mEntity->height() )
+        body->p.y = SCREEN_HEIGHT;
 }
 
 void Player::drawHp(SDL_Renderer* mRenderer,int x,int y){

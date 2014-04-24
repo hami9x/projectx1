@@ -20,6 +20,9 @@ public:
 
     Texture * image() { return mImage; }
 
+    int width() { return mImage->width(); }
+    int height() { return mImage->height(); }
+
     void render(SDL_Renderer *renderer, int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip=SDL_FLIP_NONE);
 };
 
@@ -48,11 +51,13 @@ public:
     inline void setXY(int x, int y) { mX = x; mY = y; }
     inline cpBody *body() { return mBody; }
     inline Sprite sprite() { return mSprite; }
-    static EntityCollection fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, bool forEachObject);
+    static EntityCollection fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, bool forEachObject, cpSpace *space);
     static void renderAll(EntityCollection,  SDL_Renderer *);
     static void addAll(EntityCollection, cpSpace *);
 
     void render(SDL_Renderer *);
+    int width() { return mSprite.width(); }
+    int height() { return mSprite.height(); }
 };
 
 }

@@ -4,7 +4,7 @@
 #include "global.h"
 #include "entity.h"
 #include "texture.h"
-
+#include "bullet.h"
 namespace xx {
 
 class Player {
@@ -28,7 +28,7 @@ class Player {
         void render(SDL_Renderer *r);
 
         //Event Handler
-        void handleEvent(SDL_Event e);
+        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space);
 
         //Move the aircraft
         void fly();
@@ -40,6 +40,12 @@ class Player {
 
         //DRAW HPBAR
         void drawHp(SDL_Renderer* mRenderer,int x,int y);
+
+        //body
+        cpBody *body()
+        {
+            return mEntity->body();
+        }
 
     private:
         //Velocity of player
@@ -54,9 +60,12 @@ class Player {
         //Rotation
         void rotLeft();
         void rotRight();
+        cpFloat mAngle;
 
-        //check if right button press or not
-        bool pressed;
+        //check if button press or not
+        bool Rpressed,Lpressed;
+
+        Bullet ammo[11];
 };
 
 }

@@ -51,6 +51,48 @@ class Assets {
     }
 };
 
+//COLLISION HANDLER
+static int
+beginFunc(cpArbiter *arb, cpSpace *space, void *unused)
+{
+    cpShape *a,*b;
+    cpArbiterGetShapes(arb, &a,&b);
+    if( a->group == 1 && b->group == 2 )
+    printf("Plane hit Cloud\n");
+    if( a->group == BULLET_TYPE && b->group == CLOUD_TYPE )
+        printf("Bullet hit Cloud\n");
+
+    return 0;
+}
+
+static void
+SeparateFunc (cpArbiter *arb, cpSpace *space, void *unused)
+{
+    cpShape *a,*b;
+    cpArbiterGetShapes(arb, &a,&b);
+    if( a->group == PLANE_TYPE && b->group == CLOUD_TYPE )
+        printf("Plane separate Cloud\n");
+    if( a->group == BULLET_TYPE && b->group == CLOUD_TYPE )
+        printf("Bullet separate Cloud\n");
+}
+
+static int
+preSolveFunc (cpArbiter *arb, cpSpace *space, void *unused)
+{
+
+}
+
+static void
+postSolveFunc (cpArbiter *arb, cpSpace *space, void *unused)
+{
+
+}
+
+void collision(int type_a, int type_b, cpSpace *space)
+{
+    //collision
+    cpSpaceAddCollisionHandler(space, type_a, type_b,beginFunc, preSolveFunc, postSolveFunc, SeparateFunc, NULL);
+}
 
 class Application {
     //The window we'll be rendering to
@@ -87,17 +129,19 @@ class Application {
 
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
-        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, true);
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, true, space);
         Entity::addAll(players, space);
         Texture clImg;
         clImg.loadFromFile(mRenderer, "clouds.png");
-        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, true);
+        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, true, space);
         Entity::addAll(clouds, space);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
         //set player1
         Player p1(players[0]);
+
+        int n=0;
 
         //Main loop flag
         bool quit = false;
@@ -121,13 +165,18 @@ class Application {
                 }
                 else
                 {
-                    p1.handleEvent(e);
+                    p1.handleEvent(e, mRenderer, space);
                 }
 
             }
 
             //Move the aircraft
             p1.fly();
+
+            //collision
+            collision(PLANE_TYPE, CLOUD_TYPE, space);
+            collision(BULLET_TYPE, CLOUD_TYPE, space);
+            collision(PLANE_TYPE, BULLET_TYPE, space);
 
             //Clear screen
             SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );

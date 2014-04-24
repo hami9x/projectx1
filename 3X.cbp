@@ -49,6 +49,8 @@
 		<Unit filename="NovaSquare.ttf" />
 		<Unit filename="aircraft.gif" />
 		<Unit filename="aircraft.png" />
+		<Unit filename="bullet.cpp" />
+		<Unit filename="bullet.h" />
 		<Unit filename="cb.bmp" />
 		<Unit filename="entity.cpp" />
 		<Unit filename="entity.h" />

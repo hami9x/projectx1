@@ -50,15 +50,16 @@ cpVect toScreenCoord(TmxMap *m, cpVect v) {
     return rv;
 }
 
-EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, bool forEachObject) {
+EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, bool forEachObject, cpSpace *space) {
+    int tw,th;
     Sprite sprite;
     TmxTilesetCollection_t tilesets = m->tilesetCollection;
     if (!tilesetName.empty()) {
         for (size_t i=0; i<tilesets.size(); i++) {
             if (tilesets[i].name == tilesetName) {
                 TmxTileset ts = tilesets[i];
-                int tw = ts.tileWidth;
-                int th = ts.tileHeight;
+                tw = ts.tileWidth;
+                th = ts.tileHeight;
                 int ncols = ts.image.width/tw;
                 SDL_Rect area = {(tileid%ncols)*tw, (int(ceil((double)(tileid+1)/ncols))-1)*th, tw, th};
 
@@ -90,8 +91,8 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
 
                 cpVect *verts = new cpVect[obj.shapePoints.size()];
                 for (size_t k=0; k<obj.shapePoints.size(); k++) {
-                    verts[k].x = obj.shapePoints[k].first;
-                    verts[k].y = obj.shapePoints[k].second;
+                    verts[k].x = obj.shapePoints[k].first/2;
+                    verts[k].y = obj.shapePoints[k].second/2;
                 }
 //                for (size_t k=0; k<obj.shapePoints.size(); k++) {
 //                    verts[k].x = obj.shapePoints[k].first + obj.x;
@@ -102,7 +103,28 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 cpVect offset = toScreenCoord(m, _offset);
                 cpBodySetPos(targetBody, offset);
                 if (obj.shapeType == TmxShapeType::kPolygon) {
-                    cpPolyShapeNew(targetBody, ncount, cverts, offset);
+                    cpShape *shape;
+
+                    shape = cpBoxShapeNew(targetBody,tw,th);
+                    if(ogName == "planes")
+                        {
+                        shape->collision_type = 1;
+                        shape->layers=1;
+                        shape->group=1;
+                        cpSpaceAddShape(space, shape);
+                        cpShapeCacheBB(shape);
+                        printf("%d\n",1);
+                        };
+                    if(ogName == "clouds")
+                    {
+                        shape->collision_type = 2;
+                        shape->layers=1;
+                        shape->group=2;
+                        cpSpaceAddShape(space, shape);
+                        cpShapeCacheBB(shape);
+                        printf("%d\n",2);
+                    }
+
                     delete[] verts;
                 }
 
