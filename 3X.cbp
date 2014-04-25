@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-DGLEW_STATIC" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -33,18 +34,24 @@
 			<Add directory="vendor/tinyxml" />
 			<Add directory="vendor/tmxparser/src" />
 			<Add directory="D:/vendor/SDL2-2.0.3/include" />
-			<Add directory="D:/vendor/Chipmunk-6.2.1/include/chipmunk" />
+			<Add directory="D:/Chipmunk2D/include/chipmunk" />
 			<Add directory="D:/vendor/SDL2_image-2.0.0/x86_64-w64-mingw32/include/SDL2" />
 			<Add directory="D:/vendor/SDL2_ttf-2.0.12/x86_64-w64-mingw32/include/SDL2" />
+			<Add directory="D:/vendor/glew-1.10.0/include/GL" />
+			<Add directory="vendor/cpDebugDraw" />
+			<Add directory="D:/sdlu/include" />
+			<Add directory="D:/sdlu/build" />
 		</Compiler>
 		<Linker>
-			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
-			<Add option="-lchipmunk" />
+			<Add option="-lmingw32 -lglew32s -lopengl32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
+			<Add option="-lchipmunk -lSDLU" />
 			<Add directory="D:/mingw_lib/lib" />
 			<Add directory="D:/vendor/SDL2-2.0.3/i686-w64-mingw32/lib" />
-			<Add directory="D:/vendor/Chipmunk-6.2.1/msvc/vc10/chipmunk/Win32/Debug DLL" />
+			<Add directory="D:/Chipmunk2D/codeblocks/bin/Debug" />
 			<Add directory="D:/vendor/SDL2_image-2.0.0/i686-w64-mingw32/lib" />
 			<Add directory="D:/vendor/SDL2_ttf-2.0.12/i686-w64-mingw32/lib" />
+			<Add directory="D:/vendor/glew-1.10.0/lib/Release/Win32" />
+			<Add directory="D:/sdlu/build/Debug" />
 		</Linker>
 		<Unit filename="NovaSquare.ttf" />
 		<Unit filename="aircraft.gif" />
@@ -69,6 +76,9 @@
 			<Option weight="59" />
 		</Unit>
 		<Unit filename="texture.h" />
+		<Unit filename="vendor/cpDebugDraw/ChipmunkDebugDraw.cpp" />
+		<Unit filename="vendor/cpDebugDraw/ChipmunkDebugDraw.h" />
+		<Unit filename="vendor/cpDebugDraw/DebugDrawImpl.cpp" />
 		<Unit filename="vendor/tinyxml/tinyxml2.cpp">
 			<Option weight="59" />
 		</Unit>

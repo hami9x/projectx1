@@ -2,11 +2,14 @@
 //Using SDL, SDL_image, SDL_ttf, standard IO, math, and strings
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_opengl.h>
 #include <SDL_ttf.h>
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <SDLU.h>
 #include "tmxparser.h"
+#include "ChipmunkDebugDraw.h"
 
 #include "global.h"
 #include "text.h"
@@ -52,46 +55,36 @@ class Assets {
 };
 
 //COLLISION HANDLER
-static int
-beginFunc(cpArbiter *arb, cpSpace *space, void *unused)
+static cpBool
+beginFunc(cpArbiter *arb, cpSpace *space, cpDataPointer unused)
 {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
-    if( a->group == 1 && b->group == 2 )
-    printf("Plane hit Cloud\n");
-    if( a->group == BULLET_TYPE && b->group == CLOUD_TYPE )
+    if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
+        printf("Plane hit Cloud\n");
+    if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet hit Cloud\n");
 
     return 0;
 }
 
 static void
-SeparateFunc (cpArbiter *arb, cpSpace *space, void *unused)
+separateFunc (cpArbiter *arb, cpSpace *space, void *unused)
 {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
-    if( a->group == PLANE_TYPE && b->group == CLOUD_TYPE )
+    if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Plane separate Cloud\n");
-    if( a->group == BULLET_TYPE && b->group == CLOUD_TYPE )
+    if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet separate Cloud\n");
-}
-
-static int
-preSolveFunc (cpArbiter *arb, cpSpace *space, void *unused)
-{
-
-}
-
-static void
-postSolveFunc (cpArbiter *arb, cpSpace *space, void *unused)
-{
-
 }
 
 void collision(int type_a, int type_b, cpSpace *space)
 {
     //collision
-    cpSpaceAddCollisionHandler(space, type_a, type_b,beginFunc, preSolveFunc, postSolveFunc, SeparateFunc, NULL);
+    cpCollisionHandler * handler = cpSpaceAddCollisionHandler(space, type_a, type_b);
+    handler->beginFunc = beginFunc;
+    handler->separateFunc = separateFunc;
 }
 
 class Application {
@@ -141,6 +134,9 @@ class Application {
         //set player1
         Player p1(players[0]);
 
+        ChipmunkDebugDrawInit();
+        SDL_RenderPresent(mRenderer);
+
         int n=0;
 
         //Main loop flag
@@ -151,10 +147,11 @@ class Application {
 
         cpFloat timeStep = 1.0/60.0;
 
+        glClearColor(1, 1, 1, 1);
+
         //While application is running
         while( !quit )
         {
-
             //Handle events on queue
             while( SDL_PollEvent( &e ) != 0 )
             {
@@ -178,23 +175,34 @@ class Application {
             collision(BULLET_TYPE, CLOUD_TYPE, space);
             collision(PLANE_TYPE, BULLET_TYPE, space);
 
-            //Clear screen
-            SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-            SDL_RenderClear( mRenderer );
+//            //Clear screen
+//            SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+//            SDL_RenderClear( mRenderer );
 
-            //Render aircraft
+//            Render aircraft
             Entity::renderAll(players, mRenderer);
             Entity::renderAll(clouds, mRenderer);
-            p1.render(mRenderer);
 
             //Add HPbar
-            p1.hp=23; p1.maxhp=100;
-            p1.drawHp(mRenderer,0,0);
-            p1.drawHp(mRenderer,666,0);
+//            p1.hp=23; p1.maxhp=100;
+//            p1.drawHp(mRenderer,0,0);
+//            p1.drawHp(mRenderer,666,0);
             //Update screen
-            SDL_RenderPresent(mRenderer);
             cpSpaceStep(space, timeStep);
+
+            SDL_RenderPresent(mRenderer);
+            SDLU_GL_RenderCacheState(mRenderer);
+            glShadeModel(GL_SMOOTH);
+            glClear(GL_COLOR_BUFFER_BIT);
+            ChipmunkDebugDrawPushRenderer();
+            PerformDebugDraw(space);
+            ChipmunkDebugDrawFlushRenderer();
+            ChipmunkDebugDrawPopRenderer();
+            glShadeModel(GL_FLAT);      /* restore state */
+            SDLU_GL_RenderRestoreState(mRenderer);
         }
+        ChipmunkDebugDrawCleanup();
+
         cpSpaceFree(space);
     }
 
@@ -234,6 +242,8 @@ class Application {
             return false;
         }
 
+        SDL_SetHintWithPriority("SDL_RENDER_DRIVER", "opengl", SDL_HINT_OVERRIDE);
+
         //Initialize SDL
         if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
         {
@@ -248,7 +258,7 @@ class Application {
         }
 
         //Create mWindow
-        mWindow = SDL_CreateWindow( "Project X1: Mini aeroPlant", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+        mWindow = SDL_CreateWindow( "Project X1: Mini aeroPlant", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
         if( mWindow == NULL )
         {
             printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );

@@ -1,6 +1,6 @@
 #ifndef ENTITY_H_INCLUDED
 #define ENTITY_H_INCLUDED
-#include <chipmunk.h>
+#include <chipmunk_private.h>
 #include "texture.h"
 #include "tmxparser.h"
 

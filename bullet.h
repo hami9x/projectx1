@@ -4,7 +4,7 @@
 #include <string>
 #include <SDL.h>
 #include "texture.h"
-#include <chipmunk.h>
+#include <chipmunk_private.h>
 
 static const std::string BULLET_IMG = "bullet.png";
 static const int BULLET_SPEED = 3;

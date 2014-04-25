@@ -101,25 +101,21 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 CP_CONVEX_HULL(obj.shapePoints.size(), verts, ncount, cverts)
                 cpVect _offset = {cpFloat(obj.x), cpFloat(obj.y)};
                 cpVect offset = toScreenCoord(m, _offset);
-                cpBodySetPos(targetBody, offset);
+                cpBodySetPosition(targetBody, offset);
                 if (obj.shapeType == TmxShapeType::kPolygon) {
                     cpShape *shape;
 
-                    shape = cpBoxShapeNew(targetBody,tw,th);
+                    shape = cpBoxShapeNew(targetBody,tw,th,tw/2);
                     if(ogName == "planes")
                         {
-                        shape->collision_type = 1;
-                        shape->layers=1;
-                        shape->group=1;
+                        cpShapeSetCollisionType(shape, PLANE_TYPE);
                         cpSpaceAddShape(space, shape);
                         cpShapeCacheBB(shape);
                         printf("%d\n",1);
                         };
                     if(ogName == "clouds")
                     {
-                        shape->collision_type = 2;
-                        shape->layers=1;
-                        shape->group=2;
+                        cpShapeSetCollisionType(shape, CLOUD_TYPE);
                         cpSpaceAddShape(space, shape);
                         cpShapeCacheBB(shape);
                         printf("%d\n",2);
@@ -146,7 +142,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
 }
 
 void Entity::render(SDL_Renderer * r) {
-    cpVect pos = cpBodyGetPos(mBody);
+    cpVect pos = cpBodyGetPosition(mBody);
     SDL_Point sdlCent = {(int)pos.x, (int)pos.y};
     mSprite.render(r, (int)pos.x, (int)pos.y, (double)cpBodyGetAngle(mBody), &sdlCent);
 }

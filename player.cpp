@@ -92,7 +92,7 @@ void Player::rotRight() {
 
 void Player::fly() {
     //Apply impulse
-    cpBodyApplyImpulse(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
+    cpBodyApplyImpulseAtLocalPoint(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
     if(ammo[0].checkExist())
         ammo[0].moveBullet();
     cpBody *body = mEntity->body();
