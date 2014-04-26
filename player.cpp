@@ -63,6 +63,7 @@ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
     if (Rpressed) {
         mVelX=sin(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
         mVelY=-cos(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
+        printf("%f %f\n",mVelX,mVelY);
     }
     //If the left button was pressed
     if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT ) {
@@ -81,6 +82,7 @@ void Player::rotLeft() {
     angle = angleAdd(angle, -PLAYER_RAD);
     mAngle = angle;
     cpBodySetAngle(mEntity->body(), angle);
+    //printf("%f %f\n", mAngle, mEntity->body()->a);
 }
 
 void Player::rotRight() {
@@ -88,23 +90,25 @@ void Player::rotRight() {
     angle = angleAdd(angle, PLAYER_RAD);
     mAngle = angle;
     cpBodySetAngle(mEntity->body(), angle);
+     //printf("%f %f\n", mAngle, mEntity->body()->a);
 }
 
 void Player::fly() {
     //Apply impulse
-    cpBodyApplyImpulseAtLocalPoint(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
+    cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
     if(ammo[0].checkExist())
         ammo[0].moveBullet();
     cpBody *body = mEntity->body();
+    printf("%f %f \n", body->p.x, body->p.y);
     //Move around screen
-    if( body->p.x > SCREEN_WIDTH )
+    if( body->p.x > SCREEN_WIDTH + mEntity->width()/2 )
         body->p.x = -mEntity->width();
     if( body->p.x < -mEntity->width() )
-        body->p.x = SCREEN_WIDTH;
-    if( body->p.y > SCREEN_HEIGHT )
+        body->p.x = SCREEN_WIDTH + mEntity->width()/2;
+    if( body->p.y > SCREEN_HEIGHT + mEntity->height()/2)
         body->p.y = -mEntity->height();
     if( body->p.y < -mEntity->height() )
-        body->p.y = SCREEN_HEIGHT;
+        body->p.y = SCREEN_HEIGHT + mEntity->height()/2;
 }
 
 void Player::drawHp(SDL_Renderer* mRenderer,int x,int y){

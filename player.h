@@ -11,7 +11,7 @@ class Player {
     public:
 
         //Maximum velocity
-        constexpr static double PLAYER_VEL=20;
+        constexpr static double PLAYER_VEL=10;
         constexpr static int PLAYER_RAD=5;
         constexpr static double PI=3.14159265;
 

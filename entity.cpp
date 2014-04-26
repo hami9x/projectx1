@@ -17,9 +17,11 @@ Sprite::Sprite() {
     mArea = r;
 }
 
-Sprite::Sprite(Texture * image, SDL_Rect area) {
+Sprite::Sprite(Texture * image, SDL_Rect area, int width, int height) {
     mImage = image;
     mArea = area;
+    tw = width;
+    th = height;
 }
 
 Sprite::~Sprite() {}
@@ -63,7 +65,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 int ncols = ts.image.width/tw;
                 SDL_Rect area = {(tileid%ncols)*tw, (int(ceil((double)(tileid+1)/ncols))-1)*th, tw, th};
 
-                sprite = Sprite(image, area);
+                sprite = Sprite(image, area, tw, th);
                 break;
             }
         }
@@ -80,13 +82,13 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
             TmxObjectCollection_t objs = objGroups[i].objects;
             cpBody *body = NULL;
             if (!forEachObject) {
-                body = cpBodyNew(10.0f, INFINITY);
+                body = cpBodyNew(5.0f, INFINITY );
             }
             for (size_t j=0; j<objs.size(); j++) {
                 TmxObject obj = objs[j];
                 cpBody *targetBody = body;
                 if (forEachObject) {
-                    targetBody = cpBodyNew(10.0f, INFINITY);
+                    targetBody = cpBodyNew(5.0f, INFINITY );
                 }
 
                 cpVect *verts = new cpVect[obj.shapePoints.size()];
@@ -102,10 +104,12 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 cpVect _offset = {cpFloat(obj.x), cpFloat(obj.y)};
                 cpVect offset = toScreenCoord(m, _offset);
                 cpBodySetPosition(targetBody, offset);
+                targetBody->p.x += tw/2;
+                targetBody->p.y += th/2;
                 if (obj.shapeType == TmxShapeType::kPolygon) {
                     cpShape *shape;
 
-                    shape = cpBoxShapeNew(targetBody,tw,th,tw/2);
+                    shape = cpBoxShapeNew(targetBody,tw,th,0);
                     if(ogName == "planes")
                         {
                         cpShapeSetCollisionType(shape, PLANE_TYPE);
@@ -144,7 +148,9 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
 void Entity::render(SDL_Renderer * r) {
     cpVect pos = cpBodyGetPosition(mBody);
     SDL_Point sdlCent = {(int)pos.x, (int)pos.y};
-    mSprite.render(r, (int)pos.x, (int)pos.y, (double)cpBodyGetAngle(mBody), &sdlCent);
+    double x = mSprite.width() /2;
+    double y = mSprite.height() /2;
+    mSprite.render(r, (int)pos.x - x , (int)pos.y - y , (double)cpBodyGetAngle(mBody), &sdlCent);
 }
 
 void Entity::renderAll(EntityCollection ec, SDL_Renderer * r) {
