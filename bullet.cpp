@@ -24,7 +24,6 @@ Bullet::~Bullet() {
 }
 
 void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range) {
-    printf("^^");
     img.loadFromFile(r,BULLET_IMG);
     exist = true;
     mRange = range;
@@ -39,7 +38,7 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range) {
     cpShapeCacheBB(shape);
     cpSpaceAddBody(space,mBody);
 
-    printf("%f %f\n",mBody->p.x, mBody->p.y);
+    //printf("%f %f\n",mBody->p.x, mBody->p.y);
 }
 
 void Bullet::getPlayerVel( double pVelX, double pVelY ) {

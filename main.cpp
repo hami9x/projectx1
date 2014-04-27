@@ -122,12 +122,11 @@ class Application {
 
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
-        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, true, space);
-        Entity::addAll(players, space);
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space);
         Texture clImg;
-        clImg.loadFromFile(mRenderer, "clouds.png");
-        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, true, space);
-        Entity::addAll(clouds, space);
+//        clImg.loadFromFile(mRenderer, "clouds.png");
+//        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space);
+//        Entity::addAll(clouds, space);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -136,8 +135,6 @@ class Application {
 
         ChipmunkDebugDrawInit();
         SDL_RenderPresent(mRenderer);
-
-        int n=0;
 
         //Main loop flag
         bool quit = false;
@@ -181,7 +178,7 @@ class Application {
 
 //            Render aircraft
             Entity::renderAll(players, mRenderer);
-            Entity::renderAll(clouds, mRenderer);
+//            Entity::renderAll(clouds, mRenderer);
 
             //Add HPbar
 //            p1.hp=23; p1.maxhp=100;
@@ -190,16 +187,16 @@ class Application {
             //Update screen
             cpSpaceStep(space, timeStep);
 
-            SDL_RenderPresent(mRenderer);
             SDLU_GL_RenderCacheState(mRenderer);
             glShadeModel(GL_SMOOTH);
-            glClear(GL_COLOR_BUFFER_BIT);
+//            glClear(GL_COLOR_BUFFER_BIT);
             ChipmunkDebugDrawPushRenderer();
             PerformDebugDraw(space);
             ChipmunkDebugDrawFlushRenderer();
             ChipmunkDebugDrawPopRenderer();
             glShadeModel(GL_FLAT);      /* restore state */
             SDLU_GL_RenderRestoreState(mRenderer);
+            SDL_RenderPresent(mRenderer);
         }
         ChipmunkDebugDrawCleanup();
 

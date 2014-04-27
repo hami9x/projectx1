@@ -63,7 +63,6 @@ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
     if (Rpressed) {
         mVelX=sin(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
         mVelY=-cos(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
-        printf("%f %f\n",mVelX,mVelY);
     }
     //If the left button was pressed
     if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT ) {
@@ -99,7 +98,7 @@ void Player::fly() {
     if(ammo[0].checkExist())
         ammo[0].moveBullet();
     cpBody *body = mEntity->body();
-    printf("%f %f \n", body->p.x, body->p.y);
+
     //Move around screen
     if( body->p.x > SCREEN_WIDTH + mEntity->width()/2 )
         body->p.x = -mEntity->width();
