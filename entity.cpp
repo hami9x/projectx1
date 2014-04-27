@@ -18,11 +18,9 @@ Sprite::Sprite() {
     mArea = r;
 }
 
-Sprite::Sprite(Texture * image, SDL_Rect area, int width, int height) {
+Sprite::Sprite(Texture * image, SDL_Rect area) {
     mImage = image;
     mArea = area;
-    tw = width;
-    th = height;
 }
 
 Sprite::~Sprite() {}
@@ -32,7 +30,7 @@ void Sprite::render(SDL_Renderer *renderer, int x, int y, double angle, SDL_Poin
         return;
     }
 
-    mImage->render(renderer, x, y, &mArea, angle, NULL, flip);
+    mImage->render(renderer, x, y, &mArea, angle, center, flip);
 }
 
 Entity::Entity(Sprite sprite, cpBody* body) {
@@ -82,8 +80,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
             int th = ts.tileHeight;
             int ncols = ts.image.width/tw;
             SDL_Rect area = {(tileid%ncols)*tw, (int(ceil((double)(tileid+1)/ncols))-1)*th, tw, th};
-
-            sprite = Sprite(image, area, tw, th);
+            sprite = Sprite(image, area);
             foundTile = true;
             tileset = ts;
             break;
@@ -143,7 +140,9 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 xT=p.x;
                 yT=p.y;
             }
-            bodies.push_back(cpBodyNew(5.0f, 2));
+            cpBody * body = cpBodyNew(5.0f, INFINITY);
+            bodies.push_back(body);
+            cpSpaceAddBody(space, body);
         }
     }
 
@@ -170,7 +169,6 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                  shape = cpPolyShapeNew(bodies[i], obj.shapePoints.size(), verts, trans, (obj.width+obj.height)/2);
             }
             assert(shape != NULL);
-            shape->body = bodies[i];
             cpSpaceAddShape(space, shape);
         }
         delete[] verts;
@@ -180,6 +178,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
     for (int i=0; i<tileXYs.size(); ++i) {
         cpBody *body = bodies[i];
         cpVect pos = tileXYs[i];
+        cpBodySetCenterOfGravity(body, cpv(tileset.tileWidth/2, tileset.tileHeight/2));
         cpBodySetPosition(body, cpvsub(pos, cpBodyGetCenterOfGravity(body)));
         Entity * e = new Entity(sprite, body);
         e->setType(ogName);
@@ -198,19 +197,13 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
 
 void Entity::render(SDL_Renderer * r) {
     cpVect pos = cpBodyGetPosition(mBody);
-    SDL_Point sdlCent = {(int)pos.x, (int)pos.y};
-    mSprite.render(r, (int)pos.x , (int)pos.y, (double)cpBodyGetAngle(mBody), &sdlCent);
+    SDL_Point sdlCent = {0, 0};
+    mSprite.render(r, (int)pos.x , (int)pos.y, (double)rad2deg(cpBodyGetAngle(mBody)), &sdlCent);
 }
 
 void Entity::renderAll(EntityCollection ec, SDL_Renderer * r) {
     for (size_t i=0; i<ec.size(); i++) {
         ec[i]->render(r);
-    }
-}
-
-void Entity::addAll(EntityCollection ec, cpSpace * space) {
-    for (size_t i=0; i<ec.size(); i++) {
-        cpSpaceAddBody(space, ec[i]->body());
     }
 }
 

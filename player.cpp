@@ -32,11 +32,11 @@ void Player::render(SDL_Renderer *r) {
 
 cpFloat angleAdd(cpFloat angle, cpFloat delta) {
     angle += delta;
-    if (angle >= 360) {
-        angle -= 360;
+    if (angle >= 2*M_PI) {
+        angle -= 2*M_PI;
     }
     if (angle < 0) {
-        angle += 360;
+        angle += 2*M_PI;
     }
     return angle;
 }
@@ -61,8 +61,8 @@ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
     }
     //if holding the button
     if (Rpressed) {
-        mVelX=sin(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
-        mVelY=-cos(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
+        mVelX=sin(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
+        mVelY=-cos(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
     }
     //If the left button was pressed
     if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT ) {
@@ -70,8 +70,8 @@ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
         ammo[0].getPlayerPos( mEntity->body()->p.x + mEntity->sprite().width()/2, mEntity->body()->p.y + mEntity->sprite().height()/2, mAngle );
         ammo[0].createBullet(r, space, 100);
         int tVelX,tVelY;
-        tVelX=sin(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
-        tVelY=-cos(cpBodyGetAngle(mEntity->body())*PI/180)*PLAYER_VEL;
+        tVelX=sin(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
+        tVelY=-cos(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
         ammo[0].getPlayerVel(tVelX, tVelY);
     }
 }
@@ -94,10 +94,10 @@ void Player::rotRight() {
 
 void Player::fly() {
     //Apply impulse
-    cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
+    cpBodyApplyImpulseAtLocalPoint(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
+    cpBody * body = mEntity->body();
     if(ammo[0].checkExist())
         ammo[0].moveBullet();
-    cpBody *body = mEntity->body();
 
     //Move around screen
     if( body->p.x > SCREEN_WIDTH + mEntity->width()/2 )

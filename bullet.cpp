@@ -34,9 +34,8 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range) {
 
     shape = cpBoxShapeNew(mBody, img.width(), img.height(), img.height()/2);
     cpShapeSetCollisionType(shape, BULLET_TYPE);
-    cpSpaceAddShape(space,shape);
-    cpShapeCacheBB(shape);
-    cpSpaceAddBody(space,mBody);
+    cpSpaceAddShape(space, shape);
+    cpSpaceAddBody(space, mBody);
 
     //printf("%f %f\n",mBody->p.x, mBody->p.y);
 }

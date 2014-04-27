@@ -12,17 +12,16 @@ namespace xx {
 class Sprite {
     Texture *mImage;
     SDL_Rect mArea;
-    double tw,th; //tile width, tile height
 
 public:
     Sprite();
-    Sprite(Texture *image, SDL_Rect area, int width, int height);
+    Sprite(Texture *image, SDL_Rect area);
     ~Sprite();
 
     Texture * image() { return mImage; }
 
-    int width() { return tw; }
-    int height() { return th; }
+    int width() { return mArea.w; }
+    int height() { return mArea.h; }
 
     void render(SDL_Renderer *renderer, int x, int y, double angle, SDL_Point* center, SDL_RendererFlip flip=SDL_FLIP_NONE);
 };

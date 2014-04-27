@@ -180,23 +180,22 @@ class Application {
             Entity::renderAll(players, mRenderer);
 //            Entity::renderAll(clouds, mRenderer);
 
-            //Add HPbar
-//            p1.hp=23; p1.maxhp=100;
-//            p1.drawHp(mRenderer,0,0);
-//            p1.drawHp(mRenderer,666,0);
-            //Update screen
             cpSpaceStep(space, timeStep);
+
+            p1.hp=23; p1.maxhp=100;
+            p1.drawHp(mRenderer,0,0);
+            p1.drawHp(mRenderer,666,0);
+            SDL_RenderPresent(mRenderer);
 
             SDLU_GL_RenderCacheState(mRenderer);
             glShadeModel(GL_SMOOTH);
-//            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
             ChipmunkDebugDrawPushRenderer();
             PerformDebugDraw(space);
             ChipmunkDebugDrawFlushRenderer();
             ChipmunkDebugDrawPopRenderer();
             glShadeModel(GL_FLAT);      /* restore state */
             SDLU_GL_RenderRestoreState(mRenderer);
-            SDL_RenderPresent(mRenderer);
         }
         ChipmunkDebugDrawCleanup();
 

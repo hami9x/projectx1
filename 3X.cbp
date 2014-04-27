@@ -38,7 +38,7 @@
 			<Add directory="D:/vendor/SDL2_image-2.0.0/x86_64-w64-mingw32/include/SDL2" />
 			<Add directory="D:/vendor/SDL2_ttf-2.0.12/x86_64-w64-mingw32/include/SDL2" />
 			<Add directory="D:/vendor/glew-1.10.0/include/GL" />
-			<Add directory="vendor/cpDebugDraw" />
+			<Add directory="cpDebugDraw" />
 			<Add directory="D:/sdlu/include" />
 			<Add directory="D:/sdlu/build" />
 		</Compiler>

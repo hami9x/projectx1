@@ -5,6 +5,8 @@
 #include "entity.h"
 #include "texture.h"
 #include "bullet.h"
+
+const cpFloat PLAYER_RAD = 0.05f;
 namespace xx {
 
 class Player {
@@ -12,8 +14,6 @@ class Player {
 
         //Maximum velocity
         constexpr static double PLAYER_VEL=10;
-        constexpr static int PLAYER_RAD=5;
-        constexpr static double PI=3.14159265;
 
         constexpr static int sWidth=SCREEN_WIDTH;
         constexpr static int sHeight=SCREEN_HEIGHT;
