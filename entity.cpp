@@ -52,13 +52,13 @@ cpVect toScreenCoord(TmxMap *m, cpVect v) {
 }
 
 cpVect tilePos(TmxMap *m, int k, int tileHeight) {
-    int row = k/m->width;
+    int row = k/m->width+1;
     int col = k%m->width;
     //Tmx saves the tile as the bottom left one, so we have to shift it up
-    return cpVect{col*m->tileWidth, row*m->tileHeight - tileHeight + m->tileHeight};
+    return cpVect{col*m->tileWidth, row*m->tileHeight - tileHeight};
 }
 
-EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space) {
+EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space,double mass) {
     EntityCollection entities;
     vector<cpBody*> bodies;
     vector<cpVect> tileXYs;
@@ -140,7 +140,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 xT=p.x;
                 yT=p.y;
             }
-            cpBody * body = cpBodyNew(5.0f, INFINITY);
+            cpBody * body = cpBodyNew(mass, INFINITY);
             bodies.push_back(body);
             cpSpaceAddBody(space, body);
         }
@@ -152,7 +152,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
     //Create shapes and add the right number of bodies
     for (size_t j=0; j<oc.size(); j++) {
         TmxObject obj = oc[j];
-
+        printf("%d %d %d\n",obj.x,obj.y,j);
         cpVect *verts = new cpVect[obj.shapePoints.size()];
         for (size_t k=0; k<obj.shapePoints.size(); k++) {
             verts[k].x = obj.shapePoints[k].first;
@@ -160,7 +160,6 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
         }
 
         cpVect objp = cpvsub(cpv(obj.x, obj.y), cpv(xT, yT));
-
         for (int i=0; i<bodies.size(); ++i) {
             cpVect tp = tileXYs[i];
             cpTransform trans = cpTransformTranslate(objp);
@@ -170,6 +169,8 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
             }
             assert(shape != NULL);
             cpSpaceAddShape(space, shape);
+            cpShapeSetElasticity(shape, 1);
+            cpShapeSetFriction(shape, 1);
         }
         delete[] verts;
     }
@@ -179,7 +180,8 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
         cpBody *body = bodies[i];
         cpVect pos = tileXYs[i];
         cpBodySetCenterOfGravity(body, cpv(tileset.tileWidth/2, tileset.tileHeight/2));
-        cpBodySetPosition(body, cpvsub(pos, cpBodyGetCenterOfGravity(body)));
+        //cpBodySetPosition(body, cpvsub(pos, cpBodyGetCenterOfGravity(body)));
+        cpBodySetPosition(body,pos);
         Entity * e = new Entity(sprite, body);
         e->setType(ogName);
         e->setXY(cpBodyGetPosition(body).x, cpBodyGetPosition(body).y);
@@ -198,7 +200,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
 void Entity::render(SDL_Renderer * r) {
     cpVect pos = cpBodyGetPosition(mBody);
     SDL_Point sdlCent = {0, 0};
-    mSprite.render(r, (int)pos.x , (int)pos.y, (double)rad2deg(cpBodyGetAngle(mBody)), &sdlCent);
+    mSprite.render(r, (int)pos.x , (int)pos.y , (double)rad2deg(cpBodyGetAngle(mBody)), &sdlCent);
 }
 
 void Entity::renderAll(EntityCollection ec, SDL_Renderer * r) {

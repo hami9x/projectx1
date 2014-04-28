@@ -122,10 +122,10 @@ class Application {
 
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
-        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space);
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space,5);
         Texture clImg;
-//        clImg.loadFromFile(mRenderer, "clouds.png");
-//        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space);
+        clImg.loadFromFile(mRenderer, "clouds.png");
+        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000);
 //        Entity::addAll(clouds, space);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
@@ -168,7 +168,7 @@ class Application {
             p1.fly();
 
             //collision
-            collision(PLANE_TYPE, CLOUD_TYPE, space);
+            //collision(PLANE_TYPE, CLOUD_TYPE, space);
             collision(BULLET_TYPE, CLOUD_TYPE, space);
             collision(PLANE_TYPE, BULLET_TYPE, space);
 
@@ -178,7 +178,7 @@ class Application {
 
 //            Render aircraft
             Entity::renderAll(players, mRenderer);
-//            Entity::renderAll(clouds, mRenderer);
+            Entity::renderAll(clouds, mRenderer);
 
             cpSpaceStep(space, timeStep);
 
