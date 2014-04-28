@@ -126,7 +126,6 @@ class Application {
         Texture clImg;
         clImg.loadFromFile(mRenderer, "clouds.png");
         EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000);
-//        Entity::addAll(clouds, space);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -182,9 +181,9 @@ class Application {
 
             cpSpaceStep(space, timeStep);
 
-            p1.hp=23; p1.maxhp=100;
-            p1.drawHp(mRenderer,0,0);
-            p1.drawHp(mRenderer,666,0);
+            //p1.hp=23; p1.maxhp=100;
+            //p1.drawHp(mRenderer,0,0);
+            //p1.drawHp(mRenderer,666,0);
             SDL_RenderPresent(mRenderer);
 
             SDLU_GL_RenderCacheState(mRenderer);

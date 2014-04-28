@@ -5,7 +5,7 @@
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 702;
+const int SCREEN_HEIGHT = 704;
 
 //Collision Type
 const int PLANE_TYPE = 1;
