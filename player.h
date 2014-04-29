@@ -30,6 +30,8 @@ class Player {
         //Event Handler
         void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space);
 
+        void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time);
+
         //Move the aircraft
         void fly();
 
@@ -46,6 +48,8 @@ class Player {
         {
             return mEntity->body();
         }
+        //free bullet
+        void freeBullet(Bullet a);
 
     private:
         //Velocity of player
@@ -65,7 +69,9 @@ class Player {
         //check if button press or not
         bool Rpressed,Lpressed;
 
-        Bullet ammo[11];
+        //Maximum bullet
+        int maxAmmo;
+        Bullet ammo[10];
 };
 
 }

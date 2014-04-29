@@ -16,6 +16,7 @@
 #include "texture.h"
 #include "entity.h"
 #include "player.h"
+#include "bullet.h"
 
 using namespace std;
 using namespace tmxparser;
@@ -54,6 +55,18 @@ class Assets {
     }
 };
 
+//Post-step: Ammo free
+static void
+ammoFree( cpSpace *space, cpShape *shape, void *unused)
+{
+    cpBody *Body = cpShapeGetBody(shape);
+    Bullet *ammo = (Bullet*)cpBodyGetUserData(Body);
+    cpVect pos = cpBodyGetPosition(Body);
+    printf("body->p: %f %f \n", Body->p.x, Body->p.y);
+    printf("Posion: %f %f \n",pos.x,pos.y);
+    ammo->explosion(Body->p.x - 59, Body->p.y - 59);
+    ammo->free();
+}
 //COLLISION HANDLER
 static cpBool
 beginFunc(cpArbiter *arb, cpSpace *space, cpDataPointer unused)
@@ -64,6 +77,15 @@ beginFunc(cpArbiter *arb, cpSpace *space, cpDataPointer unused)
         printf("Plane hit Cloud\n");
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet hit Cloud\n");
+    if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == PLANE_TYPE )
+    {
+        cpBool check = cpShapeGetSensor(a);
+        if(!check){
+            printf("Hit plane\n");
+
+            cpSpaceAddPostStepCallback( space, (cpPostStepFunc)ammoFree, a, NULL);
+        }
+    }
 
     return 0;
 }
@@ -143,6 +165,7 @@ class Application {
         SDL_Event e;
 
         cpFloat timeStep = 1.0/60.0;
+        cpFloat time = 0;
 
         glClearColor(1, 1, 1, 1);
 
@@ -163,14 +186,16 @@ class Application {
                 }
 
             }
-
+            //Firing
+            time += timeStep;
+            p1.handleFire(mRenderer, space, time);
             //Move the aircraft
             p1.fly();
 
             //collision
             collision(PLANE_TYPE, CLOUD_TYPE, space);
             collision(BULLET_TYPE, CLOUD_TYPE, space);
-            collision(PLANE_TYPE, BULLET_TYPE, space);
+            collision(BULLET_TYPE, PLANE_TYPE , space);
 
 //            //Clear screen
 //            SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -178,6 +203,7 @@ class Application {
 
 //            Render aircraft
             Entity::renderAll(players, mRenderer);
+            p1.render(mRenderer);
 //            Entity::renderAll(clouds, mRenderer);
 
             cpSpaceStep(space, timeStep);

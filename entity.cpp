@@ -133,7 +133,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
     int xT=0, yT=0;
     for (int k=0; k<layer.tiles.size(); k++) {
         TmxLayerTile tile = layer.tiles[k];
-        if (tile.gid == gid) {
+     if (tile.gid == gid) {
             cpVect p = tilePos(m, k, tileset.tileHeight);
             tileXYs.push_back(p);
             if (p.x<=objPos.x && p.y<=objPos.y && p.x>=xT && p.y>=yT) {
@@ -167,6 +167,8 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
             cpShape *shape = NULL;
             if (obj.shapeType == TmxShapeType::kPolygon || obj.shapeType == TmxShapeType::kPolyline) {
                  shape = cpPolyShapeNew(bodies[i], obj.shapePoints.size(), verts, trans, (obj.width+obj.height)/2);
+                 if( ogName == "planes" )
+                    cpShapeSetCollisionType(shape, PLANE_TYPE);
             }
             assert(shape != NULL);
             cpSpaceAddShape(space, shape);
@@ -190,7 +192,6 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
         cpBody* body = bodies[i];
         printf("poss: %f, %f | %f, %f\n", cpBodyGetPosition(body).x, cpBodyGetPosition(body).y, cpBodyGetCenterOfGravity(body).x, cpBodyGetCenterOfGravity(body).y);
     }
-
 
     return entities;
 }

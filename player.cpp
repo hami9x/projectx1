@@ -17,6 +17,7 @@ Player::Player(Entity * e) {
     mVelY=0;
     Rpressed=false;
     Lpressed=false;
+    maxAmmo=5;
 }
 
 Player::~Player() {
@@ -24,9 +25,12 @@ Player::~Player() {
 
 void Player::render(SDL_Renderer *r) {
 
-    mEntity->render(r);
-    if( ammo[0].checkExist() ){
-        ammo[0].render(r);
+    for(int i=0; i<=maxAmmo; i++)
+    {
+        if( ammo[i].checkExist() )
+            ammo[i].render(r);
+        if( ammo[i].checkExpl() )
+            ammo[i].eRender(r);
     }
 }
 
@@ -59,7 +63,7 @@ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
             mVelX = 0;
             mVelY = 0;
     }
-    //if holding the button
+    //if holding the right button
     if (Rpressed) {
         mVelX=sin(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
         mVelY=-cos(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
@@ -67,12 +71,26 @@ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
     //If the left button was pressed
     if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT ) {
         Lpressed = true;
-        ammo[0].getPlayerPos( mEntity->body()->p.x + mEntity->sprite().width()/2, mEntity->body()->p.y + mEntity->sprite().height()/2, mAngle );
-        ammo[0].createBullet(r, space, 100);
-        int tVelX,tVelY;
-        tVelX=sin(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
-        tVelY=-cos(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
-        ammo[0].getPlayerVel(tVelX, tVelY);
+    } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT ) {
+        Lpressed = false;
+    }
+}
+
+void Player::handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time) {
+    //If holding the left button
+    if (Lpressed) {
+        cpBody *body = mEntity->body();
+        for( int i=0; i<=maxAmmo; i++) {
+            if ( !ammo[i].checkExist() && time>2 ) {
+                time = 0;
+                ammo[i].getPlayerPos(  body->p.x , body->p.y, mAngle, mEntity->sprite().height()/2 );
+                ammo[i].createBullet(r, space, &ammo[i], 500);
+                int tVelX,tVelY;
+                tVelX=sin( cpBodyGetAngle( body ) )*PLAYER_VEL;
+                tVelY=-cos( cpBodyGetAngle( body ) )*PLAYER_VEL;
+                ammo[i].getPlayerVel(tVelX, tVelY);
+            }
+        }
     }
 }
 
@@ -96,8 +114,9 @@ void Player::fly() {
     //Apply impulse
     cpBodyApplyImpulseAtLocalPoint(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
     cpBody * body = mEntity->body();
-    if(ammo[0].checkExist())
-        ammo[0].moveBullet();
+    for(int i=0; i<=maxAmmo; i++)
+        if( ammo[i].checkExist() )
+            ammo[i].moveBullet();
 
     //Move around screen
     if( body->p.x > SCREEN_WIDTH + mEntity->width()/2 )
@@ -130,5 +149,9 @@ void Player::drawHp(SDL_Renderer* mRenderer,int x,int y){
     strcat(num,temp);
     Text hptxt(num,TTF_OpenFont( "BKANT.ttf", 20 ), {94,19,83});
     hptxt.render(mRenderer,x+10,y+35,200);
+}
+
+void freeBulle(Bullet a){
+    a.free();
 }
 }
