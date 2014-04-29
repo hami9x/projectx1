@@ -58,7 +58,7 @@ cpVect tilePos(TmxMap *m, int k, int tileHeight) {
     return cpVect{(int)col*m->tileWidth, (int)((int)row*m->tileHeight - tileHeight)};
 }
 
-EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space, double mass) {
+EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space, double mass, int coll) {
     EntityCollection entities;
     vector<cpBody*> bodies;
     vector<cpVect> tileXYs;
@@ -173,6 +173,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
             cpSpaceAddShape(space, shape);
             cpShapeSetElasticity(shape, 1);
             cpShapeSetFriction(shape, 1);
+            cpShapeSetCollisionType(shape,coll);
         }
         delete[] verts;
     }

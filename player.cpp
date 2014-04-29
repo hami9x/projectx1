@@ -1,5 +1,5 @@
 #include "player.h"
-
+#include <SDL_ttf.h>
 #include <SDL.h>
 #include <stdio.h>
 #include <cmath>
@@ -110,7 +110,7 @@ void Player::fly() {
         body->p.y = SCREEN_HEIGHT + mEntity->height()/2;
 }
 
-void Player::drawHp(SDL_Renderer* mRenderer,int x,int y){
+void Player::drawHp(SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont){
     char num[100]="HP: ",temp[100]="";
     SDL_Rect fillRect = { x, y, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 20 };
     SDL_SetRenderDrawColor( mRenderer, 0x99,0x33,0x66, 0x00 );
@@ -128,7 +128,12 @@ void Player::drawHp(SDL_Renderer* mRenderer,int x,int y){
     strcat(num,"/");
     sprintf(temp,"%d",maxhp);
     strcat(num,temp);
-    Text hptxt(num,TTF_OpenFont( "BKANT.ttf", 20 ), {94,19,83});
+    Text hptxt(num,mFont, {94,19,83});
     hptxt.render(mRenderer,x+10,y+35,200);
 }
+void Player::hurt(int dam){
+    if (dam<hp) hp-=dam; else {
+        hp=0;
+    }
+    }
 }

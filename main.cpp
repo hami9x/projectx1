@@ -10,7 +10,7 @@
 #include <SDLU.h>
 #include "tmxparser.h"
 #include "ChipmunkDebugDraw.h"
-
+#include<new>
 #include "global.h"
 #include "text.h"
 #include "texture.h"
@@ -36,7 +36,7 @@ class Assets {
     bool load()
     {
         //Open the font
-        mDefFont = TTF_OpenFont( "NovaSquare.ttf", 28 );
+        mDefFont = TTF_OpenFont( "NovaSquare.ttf", 20 );
         if( mDefFont == NULL )
         {
             printf( "Failed to load thefont! SDL_ttf Error: %s\n", TTF_GetError() );
@@ -55,13 +55,14 @@ class Assets {
 };
 
 //COLLISION HANDLER
+bool inCloud=false;
 static cpBool
 beginFunc(cpArbiter *arb, cpSpace *space, cpDataPointer unused)
 {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-        printf("Plane hit Cloud\n");
+        inCloud=true;
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet hit Cloud\n");
 
@@ -74,17 +75,19 @@ separateFunc (cpArbiter *arb, cpSpace *space, void *unused)
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-        printf("Plane separate Cloud\n");
+       inCloud=false;
+
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet separate Cloud\n");
 }
 
-void collision(int type_a, int type_b, cpSpace *space)
+void collision(int type_a, int type_b, cpSpace *space,Player *pl)
 {
     //collision
     cpCollisionHandler * handler = cpSpaceAddCollisionHandler(space, type_a, type_b);
     handler->beginFunc = beginFunc;
     handler->separateFunc = separateFunc;
+    if (inCloud) (*pl).hurt(1);
 }
 
 class Application {
@@ -122,10 +125,10 @@ class Application {
 
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
-        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space,5);
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space,5,1);
         Texture clImg;
         clImg.loadFromFile(mRenderer, "clouds.png");
-        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000);
+        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000,2);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -167,10 +170,9 @@ class Application {
             p1.fly();
 
             //collision
-            //collision(PLANE_TYPE, CLOUD_TYPE, space);
-            collision(BULLET_TYPE, CLOUD_TYPE, space);
-            collision(PLANE_TYPE, BULLET_TYPE, space);
-
+            collision(PLANE_TYPE, CLOUD_TYPE, space,&p1);
+            collision(BULLET_TYPE, CLOUD_TYPE, space,&p1);
+            collision(PLANE_TYPE, BULLET_TYPE, space,&p1);
 //            //Clear screen
 //            SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 //            SDL_RenderClear( mRenderer );
@@ -180,10 +182,9 @@ class Application {
             Entity::renderAll(clouds, mRenderer);
 
             cpSpaceStep(space, timeStep);
-
-            //p1.hp=23; p1.maxhp=100;
-            //p1.drawHp(mRenderer,0,0);
-            //p1.drawHp(mRenderer,666,0);
+            printf("%d\n",p1.hp);
+            p1.drawHp(mRenderer,0,0,assets.defFont());
+            p1.drawHp(mRenderer,666,0,assets.defFont());
             SDL_RenderPresent(mRenderer);
 
             SDLU_GL_RenderCacheState(mRenderer);
