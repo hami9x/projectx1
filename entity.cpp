@@ -210,5 +210,20 @@ void Entity::renderAll(EntityCollection ec, SDL_Renderer * r) {
     }
 }
 
+void deleteShape(cpBody *body, cpShape *shape, void *data) {
+    cpSpace *space = (cpSpace *)data;
+    cpSpaceRemoveShape(space, shape);
+    cpShapeFree(shape);
+}
+
+void Entity::freeAll(EntityCollection ec, cpSpace * space) {
+    for (size_t i=0; i<ec.size(); i++) {
+        cpBody * body = ec[i]->body();
+        cpBodyEachShape(body, deleteShape, space);
+        cpSpaceRemoveBody(space, body);
+    }
+    delete[] &ec[0];
+}
+
 //End namspace
 }

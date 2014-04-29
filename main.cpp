@@ -197,6 +197,8 @@ class Application {
             SDLU_GL_RenderRestoreState(mRenderer);
         }
         ChipmunkDebugDrawCleanup();
+        Entity::freeAll(players, space);
+        Entity::freeAll(clouds, space);
 
         cpSpaceFree(space);
     }
