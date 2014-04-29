@@ -49,13 +49,13 @@ class Player {
         {
             return mEntity->body();
         }
-<<<<<<< HEAD
+
         //free bullet
         void freeBullet(Bullet a);
-=======
+
         //Hurt
         void hurt(int dam);
->>>>>>> 8ed3053433b5d1d7d8385f7b1ef5608a96f37624
+
 
     private:
         //Velocity of player

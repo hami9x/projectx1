@@ -150,16 +150,16 @@ void Player::drawHp(SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont){
     Text hptxt(num,mFont, {94,19,83});
     hptxt.render(mRenderer,x+10,y+35,200);
 }
-<<<<<<< HEAD
+
 
 void freeBulle(Bullet a){
     a.free();
 }
-=======
+
 void Player::hurt(int dam){
     if (dam<hp) hp-=dam; else {
         hp=0;
     }
     }
->>>>>>> 8ed3053433b5d1d7d8385f7b1ef5608a96f37624
+
 }

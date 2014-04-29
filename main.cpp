@@ -195,28 +195,23 @@ class Application {
             p1.fly();
 
             //collision
-<<<<<<< HEAD
-            collision(PLANE_TYPE, CLOUD_TYPE, space);
-            collision(BULLET_TYPE, CLOUD_TYPE, space);
-            collision(BULLET_TYPE, PLANE_TYPE , space);
 
-=======
             collision(PLANE_TYPE, CLOUD_TYPE, space,&p1);
             collision(BULLET_TYPE, CLOUD_TYPE, space,&p1);
-            collision(PLANE_TYPE, BULLET_TYPE, space,&p1);
->>>>>>> 8ed3053433b5d1d7d8385f7b1ef5608a96f37624
+            collision(BULLET_TYPE, PLANE_TYPE, space,&p1);
+
 //            //Clear screen
 //            SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 //            SDL_RenderClear( mRenderer );
 
 //            Render aircraft
             Entity::renderAll(players, mRenderer);
-<<<<<<< HEAD
+
             p1.render(mRenderer);
 //            Entity::renderAll(clouds, mRenderer);
-=======
+
             Entity::renderAll(clouds, mRenderer);
->>>>>>> 8ed3053433b5d1d7d8385f7b1ef5608a96f37624
+
 
             cpSpaceStep(space, timeStep);
             printf("%d\n",p1.hp);
