@@ -1,6 +1,7 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include "global.h"
 #include "entity.h"
 #include "texture.h"
@@ -37,19 +38,24 @@ class Player {
 
 
         //HP
-        int hp;
-        int maxhp;
+        int hp=10000;
+        int maxhp=10000;
 
         //DRAW HPBAR
-        void drawHp(SDL_Renderer* mRenderer,int x,int y);
+        void drawHp(SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont);
 
         //body
         cpBody *body()
         {
             return mEntity->body();
         }
+<<<<<<< HEAD
         //free bullet
         void freeBullet(Bullet a);
+=======
+        //Hurt
+        void hurt(int dam);
+>>>>>>> 8ed3053433b5d1d7d8385f7b1ef5608a96f37624
 
     private:
         //Velocity of player
