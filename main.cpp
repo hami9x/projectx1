@@ -68,14 +68,14 @@ ammoFree( cpSpace *space, cpShape *shape, void *unused)
     ammo->free();
 }
 //COLLISION HANDLER
-bool inCloud=false;
+int inCloud=0;
 static cpBool
 beginFunc(cpArbiter *arb, cpSpace *space, cpDataPointer unused)
 {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-        inCloud=true;
+        inCloud+=1;
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet hit Cloud\n");
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == PLANE_TYPE )
@@ -97,7 +97,7 @@ separateFunc (cpArbiter *arb, cpSpace *space, void *unused)
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-       inCloud=false;
+       inCloud-=1;
 
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet separate Cloud\n");
@@ -109,7 +109,7 @@ void collision(int type_a, int type_b, cpSpace *space,Player *pl)
     cpCollisionHandler * handler = cpSpaceAddCollisionHandler(space, type_a, type_b);
     handler->beginFunc = beginFunc;
     handler->separateFunc = separateFunc;
-    if (inCloud) (*pl).hurt(1);
+    if (inCloud!=0) (*pl).hurt(inCloud);
 }
 
 class Application {
@@ -214,7 +214,6 @@ class Application {
 
 
             cpSpaceStep(space, timeStep);
-            printf("%d\n",p1.hp);
             p1.drawHp(mRenderer,0,0,assets.defFont());
             p1.drawHp(mRenderer,666,0,assets.defFont());
             SDL_RenderPresent(mRenderer);
