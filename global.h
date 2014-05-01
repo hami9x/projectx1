@@ -12,6 +12,7 @@ const int PLANE_TYPE = 1;
 const int CLOUD_TYPE = 2;
 const int BULLET_TYPE =3;
 
+
 inline double rad2deg(double radians) {
     return radians*(180.0/M_PI);
 }

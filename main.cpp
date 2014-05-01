@@ -10,7 +10,6 @@
 #include <SDLU.h>
 #include "tmxparser.h"
 #include "ChipmunkDebugDraw.h"
-#include<new>
 #include "global.h"
 #include "text.h"
 #include "texture.h"
@@ -69,17 +68,12 @@ ammoFree( cpSpace *space, cpShape *shape, void *unused)
 }
 //in/out Cloud counting
 void
-planeInCloud(cpShape *shape){
+planeCloud(cpShape *shape,int num){
     cpBody *Body = cpShapeGetBody(shape);
     Player *pl = (Player*)cpBodyGetUserData(Body);
-    (*pl).inCloud+=1;
+    (*pl).inCloud+=num;
 }
-void
-planeOutCloud(cpShape *shape){
-    cpBody *Body = cpShapeGetBody(shape);
-    Player *pl = (Player*)cpBodyGetUserData(Body);
-    (*pl).inCloud-=1;
-}
+
 //COLLISION HANDLER
 static cpBool
 beginFunc(cpArbiter *arb, cpSpace *space, void* unused)
@@ -87,7 +81,7 @@ beginFunc(cpArbiter *arb, cpSpace *space, void* unused)
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-        planeInCloud(a);
+        planeCloud(a,1);
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet hit Cloud\n");
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == PLANE_TYPE )
@@ -109,7 +103,7 @@ separateFunc (cpArbiter *arb, cpSpace *space, void *unused)
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-       planeOutCloud(a);
+       planeCloud(a,-1);
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet separate Cloud\n");
 }
