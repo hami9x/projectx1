@@ -56,6 +56,9 @@ class Player {
         //Hurt
         void hurt(int dam);
 
+        //in Cloud
+        int inCloud=0;
+
 
     private:
         //Velocity of player

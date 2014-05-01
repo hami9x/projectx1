@@ -67,15 +67,27 @@ ammoFree( cpSpace *space, cpShape *shape, void *unused)
     ammo->explosion(Body->p.x - 59, Body->p.y - 59);
     ammo->free();
 }
+//in/out Cloud counting
+void
+planeInCloud(cpShape *shape){
+    cpBody *Body = cpShapeGetBody(shape);
+    Player *pl = (Player*)cpBodyGetUserData(Body);
+    (*pl).inCloud+=1;
+}
+void
+planeOutCloud(cpShape *shape){
+    cpBody *Body = cpShapeGetBody(shape);
+    Player *pl = (Player*)cpBodyGetUserData(Body);
+    (*pl).inCloud-=1;
+}
 //COLLISION HANDLER
-int inCloud=0;
 static cpBool
-beginFunc(cpArbiter *arb, cpSpace *space, cpDataPointer unused)
+beginFunc(cpArbiter *arb, cpSpace *space, void* unused)
 {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-        inCloud+=1;
+        planeInCloud(a);
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet hit Cloud\n");
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == PLANE_TYPE )
@@ -97,8 +109,7 @@ separateFunc (cpArbiter *arb, cpSpace *space, void *unused)
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-       inCloud-=1;
-
+       planeOutCloud(a);
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet separate Cloud\n");
 }
@@ -109,7 +120,7 @@ void collision(int type_a, int type_b, cpSpace *space,Player *pl)
     cpCollisionHandler * handler = cpSpaceAddCollisionHandler(space, type_a, type_b);
     handler->beginFunc = beginFunc;
     handler->separateFunc = separateFunc;
-    if (inCloud!=0) (*pl).hurt(inCloud);
+    if ((*pl).inCloud!=0) (*pl).hurt((*pl).inCloud);
 }
 
 class Application {
@@ -147,15 +158,18 @@ class Application {
 
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
-        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space,5,1);
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space);
         Texture clImg;
         clImg.loadFromFile(mRenderer, "clouds.png");
-        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000,2);
+        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
         //set player1
         Player p1(players[0]);
+
+        //Set Body to player  ? . Is there any better place to put this ?
+        cpBodySetUserData(p1.body(),&p1);
 
         ChipmunkDebugDrawInit();
         SDL_RenderPresent(mRenderer);
