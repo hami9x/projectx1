@@ -18,6 +18,7 @@ Player::Player(Entity * e) {
     Rpressed=false;
     Lpressed=false;
     maxAmmo=5;
+    cpBodySetUserData(mEntity->body(), this);
 }
 
 Player::~Player() {
@@ -29,8 +30,6 @@ void Player::render(SDL_Renderer *r) {
     {
         if( ammo[i].checkExist() )
             ammo[i].render(r);
-        if( ammo[i].checkExpl() )
-            ammo[i].eRender(r);
     }
 }
 
@@ -83,12 +82,7 @@ void Player::handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time) {
         for( int i=0; i<=maxAmmo; i++) {
             if ( !ammo[i].checkExist() && time>2 ) {
                 time = 0;
-                ammo[i].getPlayerPos(  body->p.x , body->p.y, mAngle, mEntity->sprite().height()/2 );
-                ammo[i].createBullet(r, space, &ammo[i], 500);
-                int tVelX,tVelY;
-                tVelX=sin( cpBodyGetAngle( body ) )*PLAYER_VEL;
-                tVelY=-cos( cpBodyGetAngle( body ) )*PLAYER_VEL;
-                ammo[i].getPlayerVel(tVelX, tVelY);
+                ammo[i].createBullet(r, space, 500, this);
             }
         }
     }
@@ -145,11 +139,6 @@ void Player::drawHp(SDL_Renderer* mRenderer,int x,int y,TTF_Font *Font){
     sprintf(num,"%d/%d",hp,maxhp);
     Text hptxt(num,Font, {94,19,83});
     hptxt.render(mRenderer,x+10,y+35,200);
-}
-
-
-void freeBulle(Bullet a){
-    a.free();
 }
 
 void Player::hurt(int dam){

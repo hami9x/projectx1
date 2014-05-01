@@ -7,6 +7,7 @@
 #include <chipmunk_private.h>
 #include <stdio.h>
 #include <math.h>
+#include "player.h"
 
 namespace xx {
 
@@ -15,8 +16,6 @@ Bullet::Bullet() {
     mVelY=5;
     mRange=0;
     exist=false;
-    frame=0;
-    Hit=false;
 }
 
 Bullet::~Bullet() {
@@ -40,15 +39,24 @@ void Bullet::free() {
     mRange = 0;
 }
 
-void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, cpDataPointer n, double range) {
+void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataPointer p) {
 
-    mR=r;
+    Player *player = (Player*)p;
+    printf("in bullet %d\n", player);
+    mVelX = player->velX();
+    mVelY = player->velY();
+    mAngle = player->angle();
+    mPosX = player->posX();
+    mPosY = player->posY();
+    mX = player->sensor();
+
     img.loadFromFile(r,BULLET_IMG);
     exist = true;
     mRange = range;
     mBody = cpBodyNew(10.f, cpMomentForBox(10.f, img.width(), img.height()));
     mBody->p.x = mPosX;
     mBody->p.y = mPosY;
+
 
     printf("%d \n",mBody->userData);
 
@@ -62,12 +70,7 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, cpDataPointer n, doub
     cpSpaceAddBody(space, mBody);
 
     cpBodySetAngle(mBody,mAngle);
-    cpBodySetUserData(mBody, n);
-}
-
-void Bullet::getPlayerVel( double pVelX, double pVelY ) {
-    mVelX = pVelX;
-    mVelY = pVelY;
+    cpBodySetUserData(mBody, this);
 }
 
 void Bullet::render(SDL_Renderer * r) {
@@ -82,64 +85,10 @@ void Bullet::render(SDL_Renderer * r) {
     img.render(r, (int)pos.x - cog.x, (int)pos.y - cog.y, NULL ,(double)rad2deg(mAngle), NULL, SDL_FLIP_NONE);
 }
 
-void Bullet::getPlayerPos(cpFloat pPosX, cpFloat pPosY, cpFloat pAngle, cpFloat pX){
-    mPosX = pPosX;
-    mPosY = pPosY;
-    mX = pX;
-    mAngle = pAngle;
-}
-
 void Bullet::moveBullet() {
     mBody->p.x += mVelX;
     mBody->p.y += mVelY;
     cpBodyApplyForceAtLocalPoint(mBody, cpv(mVelX, mVelY), cpv(0, 0));
 }
-
-void Bullet::explosion(cpFloat x, cpFloat y) {
-
-    if ( explSprite.loadFromFile(mR, "explosion.png") )
-    {
-        //Set sprite clips
-        gSpriteClips[ 0 ].x =   0;
-        gSpriteClips[ 0 ].y =   0;
-        gSpriteClips[ 0 ].w =  118;
-        gSpriteClips[ 0 ].h = 118;
-
-        gSpriteClips[ 1 ].x =   118;
-        gSpriteClips[ 1 ].y =   0;
-        gSpriteClips[ 1 ].w =  118;
-        gSpriteClips[ 1 ].h = 118;
-
-        gSpriteClips[ 2 ].x =   236;
-        gSpriteClips[ 2 ].y =   0;
-        gSpriteClips[ 2 ].w =  118;
-        gSpriteClips[ 2 ].h = 118;
-
-        gSpriteClips[ 3 ].x =   354;
-        gSpriteClips[ 3 ].y =   0;
-        gSpriteClips[ 3 ].w =  118;
-        gSpriteClips[ 3 ].h = 118;
-
-        gSpriteClips[ 4 ].x =   472;
-        gSpriteClips[ 4 ].y =   0;
-        gSpriteClips[ 4 ].w =  118;
-        gSpriteClips[ 4 ].h = 118;
-
-        Hit=true;
-        ePosX = x;
-        ePosY = y;
-        frame = 0;
-        }
 }
-void Bullet::eRender(SDL_Renderer *r) {
-        //Render current frame
-        SDL_Rect* currentClip = &gSpriteClips[ frame/10 ];
-        explSprite.render(r, (int)ePosX, (int)ePosY, currentClip, 0, NULL, SDL_FLIP_NONE);
-        frame++;
-        if( frame > 40 )
-        {
-            explSprite.free();
-            Hit = false;
-        }
-}
-}
+
