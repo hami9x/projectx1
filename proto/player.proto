@@ -1,0 +1,24 @@
+message PlayerMove {
+  required float angle = 2;
+  optional int32 forwards = 3;
+}
+
+message PlayerChange {
+  required int32 time = 1;
+  optional PlayerMove move = 2;
+}
+
+message PlayerUpdate {
+  required float angle = 1;
+  required float posX = 2;
+  required float posY = 3;
+  required float velX = 4;
+  required float velY = 5;
+}
+
+message Update {
+  required int32 time = 1;
+  optional PlayerUpdate player = 2;
+}
+
+option optimize_for=LITE_RUNTIME;

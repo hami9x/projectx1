@@ -1,11 +1,11 @@
 #ifndef PLAYER_H_INCLUDED
 #define PLAYER_H_INCLUDED
 #include <SDL.h>
-#include <SDL_ttf.h>
 #include "global.h"
 #include "entity.h"
 #include "texture.h"
 #include "bullet.h"
+#include "proto/player.pb.h"
 
 const cpFloat PLAYER_RAD = 0.05f;
 namespace xx {
@@ -19,6 +19,9 @@ class Player {
         constexpr static int sWidth=SCREEN_WIDTH;
         constexpr static int sHeight=SCREEN_HEIGHT;
 
+        //Default constructor
+        Player() {}
+
         //Initializes the variables
         Player(Entity *);
 
@@ -29,7 +32,7 @@ class Player {
         void render(SDL_Renderer *r);
 
         //Event Handler
-        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space);
+        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, PlayerChange *pc);
 
         void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time);
 
@@ -41,14 +44,8 @@ class Player {
         int hp=10000;
         int maxhp=10000;
 
-        //DRAW HPBAR
-        void drawHp(SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont);
-
         //body
-        cpBody *body()
-        {
-            return mEntity->body();
-        }
+        cpBody *body() { return mEntity->body(); }
 
         //free bullet
         void freeBullet(Bullet a);
@@ -56,10 +53,13 @@ class Player {
         //Hurt
         void hurt(int dam);
 
+        void setMove(cpVect vel) { mVel = vel; }
+
+        cpVect vectorForward();
 
     private:
         //Velocity of player
-        double mVelX, mVelY;
+        cpVect mVel;
 
         //Entity
         Entity *mEntity;

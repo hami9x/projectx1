@@ -1,0 +1,5 @@
+message ClientInfo {
+  required int32 player = 1;
+}
+
+option optimize_for=LITE_RUNTIME;

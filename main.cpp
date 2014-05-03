@@ -1,5 +1,6 @@
 /* Some of the code are originally written by LazyFoo Production. */
 //Using SDL, SDL_image, SDL_ttf, standard IO, math, and strings
+#include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_opengl.h>
@@ -8,15 +9,17 @@
 #include <string>
 #include <cmath>
 #include <SDLU.h>
+#include <enet/enet.h>
 #include "tmxparser.h"
 #include "ChipmunkDebugDraw.h"
-#include<new>
 #include "global.h"
 #include "text.h"
 #include "texture.h"
 #include "entity.h"
 #include "player.h"
 #include "bullet.h"
+#include "proto/player.pb.h"
+#include "proto/clientinfo.pb.h"
 
 using namespace std;
 using namespace tmxparser;
@@ -112,6 +115,28 @@ void collision(int type_a, int type_b, cpSpace *space,Player *pl)
     if (inCloud!=0) (*pl).hurt(inCloud);
 }
 
+void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont){
+    char num[100]="HP: ",temp[100]="";
+    SDL_Rect fillRect = { x, y, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 20 };
+    SDL_SetRenderDrawColor( mRenderer, 0x99,0x33,0x66, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { x+4, y+4, SCREEN_WIDTH / 3 - 8, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+
+    fillRect = { x+4, y+4, (SCREEN_WIDTH/3 - 8)*(double)(p.hp)/p.maxhp, SCREEN_HEIGHT / 20 -8};
+    SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
+    SDL_RenderFillRect( mRenderer, &fillRect );
+    sprintf(temp,"%d",p.hp);
+    strcat(num,temp);
+    strcat(num,"/");
+    sprintf(temp,"%d",p.maxhp);
+    strcat(num,temp);
+    Text hptxt(num,mFont, {94,19,83});
+    hptxt.render(mRenderer,x+10,y+35,200);
+}
+
 class Application {
     //The window we'll be rendering to
     SDL_Window* mWindow;
@@ -131,7 +156,74 @@ class Application {
         teardown();
     }
 
-    void start() {
+    int start() {
+        if (enet_initialize () != 0)
+        {
+            fprintf (stderr, "An error occurred while initializing ENet.\n");
+            exit(EXIT_FAILURE);
+        }
+        atexit (enet_deinitialize);
+
+        ENetHost * client;
+        client = enet_host_create(NULL /* create a client host */,
+                    1 /* only allow 1 outgoing connection */,
+                    2 /* allow up 2 channels to be used, 0 and 1 */,
+                    0 /* 56K modem with 56 Kbps downstream bandwidth */,
+                    0 /* 56K modem with 14 Kbps upstream bandwidth */);
+        if (client == NULL)
+        {
+            fprintf(stderr,
+                     "An error occurred while trying to create an ENet client host.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        ENetAddress address;
+        ENetEvent event;
+        ENetPeer *host;
+        enet_address_set_host (&address, "localhost");
+        address.port = 5555;
+        /* Initiate the connection, allocating the two channels 0 and 1. */
+        host = enet_host_connect (client, &address, 2, 0);
+        if (host == NULL)
+        {
+           fprintf (stderr,
+                    "No available peers for initiating an ENet connection.\n");
+           exit (EXIT_FAILURE);
+        }
+
+        if (enet_host_service (client, & event, 5000) > 0 &&
+            event.type == ENET_EVENT_TYPE_CONNECT)
+        {
+            printf ("Connection to localhost:5555 succeeded.\n");
+        }
+        else
+        {
+            /* Either the 5 seconds are up or a disconnect event was */
+            /* received. Reset the peer in the event the 5 seconds   */
+            /* had run out without any significant event.            */
+            enet_peer_reset (host);
+            printf ("Connection to localhost:5555 failed.\n");
+            return 1;
+        }
+
+        int playerId = -1;
+        enet_host_service (client, & event, 5000);
+        if (event.type == ENET_EVENT_TYPE_RECEIVE && event.channelID == 0 && event.packet->data != NULL) {
+            string message((char*)event.packet->data);
+            ClientInfo ci;
+            ci.ParseFromString(message);
+            playerId = ci.player();
+            enet_packet_destroy (event.packet);
+        } else {
+            printf("No information received from host.\n");
+            return 1;
+        }
+
+        if (playerId == 0) {
+            printf("Unhandled.");
+            return 1;
+        }
+
         // cpVect is a 2D vector and cpv() is a shortcut for initializing them.
         cpVect gravity = cpv(0, 0);
         // Create an empty space.
@@ -147,15 +239,15 @@ class Application {
 
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
-        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space,5,1);
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space,5, PLANE_TYPE);
         Texture clImg;
         clImg.loadFromFile(mRenderer, "clouds.png");
-        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000,2);
+        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000, CLOUD_TYPE);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
         //set player1
-        Player p1(players[0]);
+        Player p1(players[playerId-1]);
 
         ChipmunkDebugDrawInit();
         SDL_RenderPresent(mRenderer);
@@ -167,9 +259,13 @@ class Application {
         SDL_Event e;
 
         cpFloat timeStep = 1.0/60.0;
-        cpFloat time = 0;
+        cpFloat updateInterval = 1.0/20.0;
+        cpFloat updateTime = 0;
+        cpFloat fireTime = 0;
 
         glClearColor(1, 1, 1, 1);
+
+        PlayerChange pc;
 
         //While application is running
         while( !quit )
@@ -184,13 +280,28 @@ class Application {
                 }
                 else
                 {
-                    p1.handleEvent(e, mRenderer, space);
+                    p1.handleEvent(e, mRenderer, space, &pc);
                 }
-
             }
             //Firing
-            time += timeStep;
-            p1.handleFire(mRenderer, space, time);
+            fireTime += timeStep;
+            updateTime += timeStep;
+            if (updateTime >= updateInterval) {
+                updateTime -= updateInterval;
+                pc.set_time(now());
+                string message = pc.SerializeAsString();
+                ENetPacket * packet = enet_packet_create(message.c_str(), message.size()+1, 0);
+                enet_peer_send(host, 1, packet);
+                pc.Clear();
+            }
+            p1.handleFire(mRenderer, space, fireTime);
+
+            enet_host_service (client, &event, 0);
+
+            if (event.type == ENET_EVENT_TYPE_RECEIVE) {
+
+            }
+
             //Move the aircraft
             p1.fly();
 
@@ -214,8 +325,8 @@ class Application {
 
 
             cpSpaceStep(space, timeStep);
-            p1.drawHp(mRenderer,0,0,assets.defFont());
-            p1.drawHp(mRenderer,666,0,assets.defFont());
+            drawPlayerHp(p1, mRenderer,0,0,assets.defFont());
+            drawPlayerHp(p1, mRenderer,666,0,assets.defFont());
             SDL_RenderPresent(mRenderer);
 
             SDLU_GL_RenderCacheState(mRenderer);
@@ -233,6 +344,7 @@ class Application {
         Entity::freeAll(clouds, space);
 
         cpSpaceFree(space);
+        enet_host_destroy(client);
     }
 
     bool loadExtensions()
@@ -338,7 +450,5 @@ int main( int argc, char* args[] )
 
     //Hide cursor
     SDL_ShowCursor(0);
-    app.start();
-
-	return 0;
+    return app.start();
 }

@@ -1,10 +1,8 @@
 #include "player.h"
-#include <SDL_ttf.h>
 #include <SDL.h>
 #include <stdio.h>
 #include <cmath>
 #include <string>
-#include "text.h"
 #include "texture.h"
 #include "bullet.h"
 
@@ -13,8 +11,7 @@ namespace xx {
 Player::Player(Entity * e) {
     mEntity=e;
     //Initialize
-    mVelX=0;
-    mVelY=0;
+    mVel = cpvzero;
     Rpressed=false;
     Lpressed=false;
     maxAmmo=5;
@@ -45,7 +42,14 @@ cpFloat angleAdd(cpFloat angle, cpFloat delta) {
     return angle;
 }
 
-void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
+cpVect Player::vectorForward() {
+    cpFloat vx = sin(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
+    cpFloat vy = -cos(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
+    return cpv(vx, vy);
+}
+
+ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, PlayerChange *pc) {
+    PlayerMove *m = pc->mutable_move();
     //Rotation
     if( e.type == SDL_MOUSEMOTION) {
         int x,y;
@@ -55,18 +59,20 @@ void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
         if( x>1 )
             rotRight();
     }
+    m->set_angle(cpBodyGetAngle(body()));
+
     //If the right button was pressed
     if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT ) {
         Rpressed = true;
     } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT ) {
             Rpressed = false;
-            mVelX = 0;
-            mVelY = 0;
+            mVel = cpvzero;
     }
+
     //if holding the right button
     if (Rpressed) {
-        mVelX=sin(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
-        mVelY=-cos(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
+        mVel = vectorForward();
+        m->set_forwards(m->forwards()+1);
     }
     //If the left button was pressed
     if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT ) {
@@ -112,7 +118,7 @@ void Player::rotRight() {
 
 void Player::fly() {
     //Apply impulse
-    cpBodyApplyImpulseAtLocalPoint(mEntity->body(), cpv(mVelX, mVelY), cpv(0, 0));
+    cpBodyApplyImpulseAtLocalPoint(mEntity->body(), mVel, cpv(0, 0));
     cpBody * body = mEntity->body();
     for(int i=0; i<=maxAmmo; i++)
         if( ammo[i].checkExist() )
@@ -128,29 +134,6 @@ void Player::fly() {
     if( body->p.y < -mEntity->height() )
         body->p.y = SCREEN_HEIGHT + mEntity->height()/2;
 }
-
-void Player::drawHp(SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont){
-    char num[100]="HP: ",temp[100]="";
-    SDL_Rect fillRect = { x, y, SCREEN_WIDTH / 3, SCREEN_HEIGHT / 20 };
-    SDL_SetRenderDrawColor( mRenderer, 0x99,0x33,0x66, 0x00 );
-    SDL_RenderFillRect( mRenderer, &fillRect );
-
-    fillRect = { x+4, y+4, SCREEN_WIDTH / 3 - 8, SCREEN_HEIGHT / 20 -8};
-    SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
-    SDL_RenderFillRect( mRenderer, &fillRect );
-
-    fillRect = { x+4, y+4, (SCREEN_WIDTH/3 - 8)*(double)hp/maxhp, SCREEN_HEIGHT / 20 -8};
-    SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
-    SDL_RenderFillRect( mRenderer, &fillRect );
-    sprintf(temp,"%d",hp);
-    strcat(num,temp);
-    strcat(num,"/");
-    sprintf(temp,"%d",maxhp);
-    strcat(num,temp);
-    Text hptxt(num,mFont, {94,19,83});
-    hptxt.render(mRenderer,x+10,y+35,200);
-}
-
 
 void freeBulle(Bullet a){
     a.free();

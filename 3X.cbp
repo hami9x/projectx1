@@ -30,28 +30,17 @@
 			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 			<Add option="`sdl-config --cflags`" />
-			<Add directory="D:/mingw_lib/include/SDL2" />
+			<Add option="-DPROTOBUF_USE_DLLS" />
 			<Add directory="vendor/tinyxml" />
 			<Add directory="vendor/tmxparser/src" />
-			<Add directory="D:/vendor/SDL2-2.0.3/include" />
-			<Add directory="D:/Chipmunk2D/include/chipmunk" />
-			<Add directory="D:/vendor/SDL2_image-2.0.0/x86_64-w64-mingw32/include/SDL2" />
-			<Add directory="D:/vendor/SDL2_ttf-2.0.12/x86_64-w64-mingw32/include/SDL2" />
-			<Add directory="D:/vendor/glew-1.10.0/include/GL" />
 			<Add directory="cpDebugDraw" />
-			<Add directory="D:/sdlu/include" />
-			<Add directory="D:/sdlu/build" />
+			<Add directory="../x1-deps/include" />
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32 -lglew32s -lopengl32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
-			<Add option="-lchipmunk -lSDLU" />
+			<Add option="-lchipmunk -lSDLU -lenet -lprotobuf" />
 			<Add directory="D:/mingw_lib/lib" />
-			<Add directory="D:/vendor/SDL2-2.0.3/i686-w64-mingw32/lib" />
-			<Add directory="D:/Chipmunk2D/codeblocks/bin/Debug" />
-			<Add directory="D:/vendor/SDL2_image-2.0.0/i686-w64-mingw32/lib" />
-			<Add directory="D:/vendor/SDL2_ttf-2.0.12/i686-w64-mingw32/lib" />
-			<Add directory="D:/vendor/glew-1.10.0/lib/Release/Win32" />
-			<Add directory="D:/sdlu/build/Debug" />
+			<Add directory="../x1-deps" />
 		</Linker>
 		<Unit filename="NovaSquare.ttf" />
 		<Unit filename="aircraft.gif" />
@@ -69,6 +58,10 @@
 		<Unit filename="map.tmx" />
 		<Unit filename="player.cpp" />
 		<Unit filename="player.h" />
+		<Unit filename="proto/clientinfo.pb.cc" />
+		<Unit filename="proto/clientinfo.pb.h" />
+		<Unit filename="proto/player.pb.cc" />
+		<Unit filename="proto/player.pb.h" />
 		<Unit filename="text.cpp">
 			<Option weight="74" />
 		</Unit>

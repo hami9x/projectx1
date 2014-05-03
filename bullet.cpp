@@ -129,14 +129,14 @@ void Bullet::explosion(cpFloat x, cpFloat y) {
         ePosX = x;
         ePosY = y;
         frame = 0;
-        }
+    }
 }
 void Bullet::eRender(SDL_Renderer *r) {
         //Render current frame
         SDL_Rect* currentClip = &gSpriteClips[ frame/10 ];
         explSprite.render(r, (int)ePosX, (int)ePosY, currentClip, 0, NULL, SDL_FLIP_NONE);
         frame++;
-        if( frame > 40 )
+        if( frame > 100 )
         {
             explSprite.free();
             Hit = false;

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="server" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add directory="../vendor/tinyxml" />
+					<Add directory="../" />
+					<Add directory="../vendor/tmxparser/src" />
+					<Add directory="../../x1-deps/include" />
+				</Compiler>
+				<Linker>
+					<Add directory="../../x1-deps" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add directory=".." />
+		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lchipmunk -lenet -lprotobuf" />
+		</Linker>
+		<Unit filename="../bullet.cpp" />
+		<Unit filename="../entity.cpp" />
+		<Unit filename="../entity.h" />
+		<Unit filename="../global.h" />
+		<Unit filename="../map.tmx" />
+		<Unit filename="../player.cpp" />
+		<Unit filename="../proto/clientinfo.pb.cc" />
+		<Unit filename="../proto/clientinfo.pb.h" />
+		<Unit filename="../proto/player.pb.cc" />
+		<Unit filename="../proto/player.pb.h" />
+		<Unit filename="../texture.cpp" />
+		<Unit filename="../vendor/tinyxml/tinyxml2.cpp" />
+		<Unit filename="../vendor/tinyxml/tinyxml2.h" />
+		<Unit filename="../vendor/tmxparser/src/tmxparser.cpp" />
+		<Unit filename="../vendor/tmxparser/src/tmxparser.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
