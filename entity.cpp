@@ -58,7 +58,7 @@ cpVect tilePos(TmxMap *m, int k, int tileHeight) {
     return cpVect{(int)col*m->tileWidth, (int)((int)row*m->tileHeight - tileHeight)};
 }
 
-EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space, double mass, int coll) {
+EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space) {
     EntityCollection entities;
     vector<cpBody*> bodies;
     vector<cpVect> tileXYs;
@@ -141,7 +141,7 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
                 xT=p.x;
                 yT=p.y;
             }
-            cpBody * body = cpBodyNew(mass, INFINITY);
+            cpBody * body = cpBodyNew(5, INFINITY);
             bodies.push_back(body);
             cpSpaceAddBody(space, body);
         }
@@ -169,13 +169,12 @@ EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap
             if (obj.shapeType == TmxShapeType::kPolygon || obj.shapeType == TmxShapeType::kPolyline) {
                  shape = cpPolyShapeNew(bodies[i], obj.shapePoints.size(), verts, trans, (obj.width+obj.height)/2);
                  if( ogName == "planes" )
-                    cpShapeSetCollisionType(shape, PLANE_TYPE);
+                    cpShapeSetCollisionType(shape, PLANE_TYPE); else
+                 if( ogName == "clouds" )
+                    cpShapeSetCollisionType(shape,CLOUD_TYPE);
             }
             assert(shape != NULL);
             cpSpaceAddShape(space, shape);
-            cpShapeSetElasticity(shape, 1);
-            cpShapeSetFriction(shape, 1);
-            cpShapeSetCollisionType(shape,coll);
         }
         delete[] verts;
     }

@@ -36,8 +36,8 @@ int main(int argc, char* args[])
         printf("Tmx parse error. Code %d.\n", error);
     }
 
-    EntityCollection playerEnts = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, NULL, space, 5, PLANE_TYPE);
-    EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, NULL, space, 1000, CLOUD_TYPE);
+    EntityCollection playerEnts = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, NULL, space);
+    EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, NULL, space);
 
     vector<Player> players(playerEnts.size());
     for (size_t i=0; i<playerEnts.size(); i++) {

@@ -51,7 +51,7 @@ public:
     inline void setXY(int x, int y) { mX = x; mY = y; }
     inline cpBody *body() { return mBody; }
     inline Sprite sprite() { return mSprite; }
-    static EntityCollection fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space, double mass, int coll);
+    static EntityCollection fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space);
     static void renderAll(EntityCollection,  SDL_Renderer *);
     static void freeAll(EntityCollection, cpSpace *);
     static void addAll(EntityCollection, cpSpace *);

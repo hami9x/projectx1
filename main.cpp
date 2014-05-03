@@ -58,6 +58,35 @@ class Assets {
     }
 };
 
+//Explosion animation
+const int EXPLOSION_ANIMATION_FRAME = 5;
+const int EXPLOSION_MAXIMUM_SPRITES = 3;
+SDL_Rect gSpriteClips[ EXPLOSION_ANIMATION_FRAME ];
+Texture explosionSprite[EXPLOSION_MAXIMUM_SPRITES];
+bool explosionCheck[EXPLOSION_MAXIMUM_SPRITES]; // check if sprite not in use
+cpFloat explosionPosition[EXPLOSION_MAXIMUM_SPRITES][2];
+int explosionFrame[EXPLOSION_MAXIMUM_SPRITES]; //explosion current frame
+//Explosion render
+void explosionRender(SDL_Renderer *r, int spriteNumber) {
+        //Render current frame
+        int i = spriteNumber;
+        SDL_Rect* currentClip = &gSpriteClips[ explosionFrame[i]/20 ];
+        explosionSprite[i].render(r, (int)explosionPosition[i][0], (int)explosionPosition[i][1], currentClip, 0, NULL, SDL_FLIP_NONE);
+        explosionFrame[i]++;
+        if( explosionFrame[i] > 80 ){
+            explosionCheck[i] = false;
+            explosionFrame[i] = 0;
+        }
+}
+//Setting explosion
+void explosionSet(int spriteNumber, cpFloat x, cpFloat y )
+{
+    int i = spriteNumber;
+    explosionCheck[i] = true;
+    explosionPosition[i][0] = x;
+    explosionPosition[i][1] = y;
+}
+
 //Post-step: Ammo free
 static void
 ammoFree( cpSpace *space, cpShape *shape, void *unused)
@@ -67,18 +96,28 @@ ammoFree( cpSpace *space, cpShape *shape, void *unused)
     cpVect pos = cpBodyGetPosition(Body);
     printf("body->p: %f %f \n", Body->p.x, Body->p.y);
     printf("Posion: %f %f \n",pos.x,pos.y);
-    ammo->explosion(Body->p.x - 59, Body->p.y - 59);
+    //ammo->explosion(Body->p.x - 59, Body->p.y - 59);
+    for(int i=0; i < EXPLOSION_MAXIMUM_SPRITES; i++)
+        if( !explosionCheck[i] )
+            explosionSet(i, Body->p.x - 59, Body->p.y - 59);
     ammo->free();
 }
+//in/out Cloud counting
+void
+planeCloud(cpShape *shape,int num){
+    cpBody *Body = cpShapeGetBody(shape);
+    Player *pl = (Player*)cpBodyGetUserData(Body);
+    (*pl).inCloud+=num;
+}
+
 //COLLISION HANDLER
-int inCloud=0;
 static cpBool
-beginFunc(cpArbiter *arb, cpSpace *space, cpDataPointer unused)
+beginFunc(cpArbiter *arb, cpSpace *space, void* unused)
 {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-        inCloud+=1;
+        planeCloud(a,1);
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet hit Cloud\n");
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == PLANE_TYPE )
@@ -100,8 +139,7 @@ separateFunc (cpArbiter *arb, cpSpace *space, void *unused)
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     if( cpShapeGetCollisionType(a) == PLANE_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
-       inCloud-=1;
-
+       planeCloud(a,-1);
     if( cpShapeGetCollisionType(a) == BULLET_TYPE && cpShapeGetCollisionType(b) == CLOUD_TYPE )
         printf("Bullet separate Cloud\n");
 }
@@ -112,7 +150,7 @@ void collision(int type_a, int type_b, cpSpace *space,Player *pl)
     cpCollisionHandler * handler = cpSpaceAddCollisionHandler(space, type_a, type_b);
     handler->beginFunc = beginFunc;
     handler->separateFunc = separateFunc;
-    if (inCloud!=0) (*pl).hurt(inCloud);
+    if ((*pl).inCloud!=0) (*pl).hurt((*pl).inCloud);
 }
 
 void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont){
@@ -239,16 +277,52 @@ class Application {
 
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
-        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space,5, PLANE_TYPE);
+        EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space);
         Texture clImg;
         clImg.loadFromFile(mRenderer, "clouds.png");
-        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space,1000, CLOUD_TYPE);
+        EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space);
         //Trap mouse to screen center
         SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
         SDL_SetRelativeMouseMode(SDL_TRUE);
         //set player1
         Player p1(players[playerId-1]);
 
+        //Load explosion animation texture
+        bool check = true;
+        for(int i=0; i < EXPLOSION_MAXIMUM_SPRITES; i++){
+            if ( !explosionSprite[i].loadFromFile(mRenderer, "explosion.png") )
+                check = false;
+            explosionCheck[i] = false;
+        }
+        if ( check )
+        {
+            //Set sprite clips
+            gSpriteClips[ 0 ].x =   0;
+            gSpriteClips[ 0 ].y =   0;
+            gSpriteClips[ 0 ].w =  118;
+            gSpriteClips[ 0 ].h = 118;
+
+            gSpriteClips[ 1 ].x =   118;
+            gSpriteClips[ 1 ].y =   0;
+            gSpriteClips[ 1 ].w =  118;
+            gSpriteClips[ 1 ].h = 118;
+
+            gSpriteClips[ 2 ].x =   236;
+            gSpriteClips[ 2 ].y =   0;
+            gSpriteClips[ 2 ].w =  118;
+            gSpriteClips[ 2 ].h = 118;
+
+            gSpriteClips[ 3 ].x =   354;
+            gSpriteClips[ 3 ].y =   0;
+            gSpriteClips[ 3 ].w =  118;
+            gSpriteClips[ 3 ].h = 118;
+
+            gSpriteClips[ 4 ].x =   472;
+            gSpriteClips[ 4 ].y =   0;
+            gSpriteClips[ 4 ].w =  118;
+            gSpriteClips[ 4 ].h = 118;
+        }
+        //Debug Draw
         ChipmunkDebugDrawInit();
         SDL_RenderPresent(mRenderer);
 
@@ -319,6 +393,9 @@ class Application {
             Entity::renderAll(players, mRenderer);
 
             p1.render(mRenderer);
+            for(int i=0; i < EXPLOSION_MAXIMUM_SPRITES; i++)
+                if( explosionCheck[i] )
+                    explosionRender(mRenderer, i);
 //            Entity::renderAll(clouds, mRenderer);
 
             Entity::renderAll(clouds, mRenderer);

@@ -57,6 +57,17 @@ class Player {
 
         cpVect vectorForward();
 
+        //in Cloud
+        int inCloud=0;
+
+        //Getter
+        double velX() { return sin( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
+        double velY() { return -cos( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
+        cpFloat posX() { return mEntity->body()->p.x; }
+        cpFloat posY() { return mEntity->body()->p.y; }
+        cpFloat angle() { return mAngle; }
+        cpFloat sensor() { return mEntity->sprite().height()/2; }
+
     private:
         //Velocity of player
         cpVect mVel;
