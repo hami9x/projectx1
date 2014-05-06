@@ -70,8 +70,9 @@ int main(int argc, char* args[])
     start = std::clock();
     while (1)
     {
+        printf("%d\n",start);
         duration = (std::clock() - start) / (double)CLOCKS_PER_MSEC;
-        if (duration > 100) {
+        if (duration >= 0) {
             start = std::clock();
             for (size_t i=0; i<players.size(); ++i) {
                 Player * player = &players[i];
@@ -79,12 +80,13 @@ int main(int argc, char* args[])
                 pu.set_angle(cpBodyGetAngle(player->body()));
                 cpVect pos = cpBodyGetPosition(player->body());
                 cpVect vel = cpBodyGetVelocity(player->body());
-                pu.set_posx(pos.x);
-                pu.set_posy(pos.y);
+                pu.set_posx(100);
+                pu.set_posy(100);
                 pu.set_velx(vel.x);
                 pu.set_vely(vel.y);
                 string pus = pu.SerializeAsString();
-                enet_host_broadcast(server, 3, enet_packet_create(pus.c_str(), pus.size()+1, 0));
+                enet_host_broadcast(server,i, enet_packet_create(pus.c_str(), pus.size()+1, 0));
+                printf("Broadcast Player %u , pos(%f,%f) , vel(%f,%f)\n",i+1,pu.posx(),pu.posy(),pu.velx(),pu.vely());
             }
         }
 
@@ -114,7 +116,7 @@ int main(int argc, char* args[])
                     event.channelID);
             if (event.channelID == 1) {
                 int playerId = (int)event.peer->data;
-                Player *p = &players[playerId];
+                Player *p = &players[playerId-1];
                 PlayerChange pc;
                 pc.ParseFromString(std::string((char*)event.packet->data));
                 if (lastUpdated[playerId] < pc.time()) {
@@ -124,6 +126,11 @@ int main(int argc, char* args[])
                     p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
                     p->fly();
                 }
+                printf("Receive Player %d , pos(%f,%f) , vel(%f,%f)\n",playerId,
+                       cpBodyGetPosition(p->body()).x,
+                       cpBodyGetPosition(p->body()).y,
+                       cpBodyGetVelocity(p->body()).x,
+                       cpBodyGetPosition(p->body()).y);
             }
             /* Clean up the packet now that we're done using it. */
             enet_packet_destroy (event.packet);

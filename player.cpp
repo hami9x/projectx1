@@ -66,6 +66,7 @@ namespace xx {
         } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT ) {
                 Rpressed = false;
                 mVel = cpvzero;
+                m->set_forwards(0);
         }
 
         //if holding the right button
@@ -113,6 +114,7 @@ namespace xx {
     void Player::fly() {
         //Apply impulse
         cpBodyApplyImpulseAtLocalPoint(mEntity->body(), mVel, cpv(0, 0));
+        printf("Vel(%f,%f)\n",cpBodyGetVelocity(mEntity->body()).x,cpBodyGetVelocity(mEntity->body()).y);
         cpBody * body = mEntity->body();
         for(int i=0; i<=maxAmmo; i++)
             if( ammo[i].checkExist() )

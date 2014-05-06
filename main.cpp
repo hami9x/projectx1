@@ -282,11 +282,12 @@ class Application {
         clImg.loadFromFile(mRenderer, "clouds.png");
         EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, &clImg, space);
         //Trap mouse to screen center
-        SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
-        SDL_SetRelativeMouseMode(SDL_TRUE);
+        //SDL_WarpMouseInWindow(mWindow, SCREEN_WIDTH /2, SCREEN_HEIGHT /2);
+        //SDL_SetRelativeMouseMode(SDL_TRUE);
         //set player1
         Player p1(players[playerId-1]);
-
+        //Assume we have 2 player only, this could be change later.
+        Player p2(players[2-playerId]);
         //Load explosion animation texture
         bool check = true;
         for(int i=0; i < EXPLOSION_MAXIMUM_SPRITES; i++){
@@ -357,6 +358,7 @@ class Application {
                     p1.handleEvent(e, mRenderer, space, &pc);
                 }
             }
+
             //Firing
             fireTime += timeStep;
             updateTime += timeStep;
@@ -369,16 +371,27 @@ class Application {
                 pc.Clear();
             }
             p1.handleFire(mRenderer, space, fireTime);
+             enet_host_service (client, &event, 0);
 
-            enet_host_service (client, &event, 0);
-
-            if (event.type == ENET_EVENT_TYPE_RECEIVE) {
-
+            if (event.type == ENET_EVENT_TYPE_RECEIVE)
+            {
+                    printf ("A packet of length %u was received from %d on channel %u.\n",
+                    event.packet -> dataLength,
+                    (int)event.peer -> data,
+                    event.channelID);
+            {
+                PlayerUpdate pu;
+                pu.ParseFromString(std::string((char*)event.packet->data));
+                Player *p=event.channelID==0?&p1:&p2;
+                if (cpBodyGetAngle(p->body())!=pu.angle()) printf("Incorrect angle !:%f\n",pu.angle());
+                //cpBodySetAngle(p->body(),pu.angle());
+                p->setMove(cpv(pu.velx(),pu.vely()));
+                printf("Player : %u , Pos(%lf,%lf) , vel(%lf,%lf) \n",event.channelID,pu.posx(),pu.posy(),pu.velx(),pu.vely());
             }
-
+            }
             //Move the aircraft
             p1.fly();
-
+            p2.fly();
             //collision
 
             collision(PLANE_TYPE, CLOUD_TYPE, space,&p1);
@@ -526,6 +539,6 @@ int main( int argc, char* args[] )
 	}
 
     //Hide cursor
-    SDL_ShowCursor(0);
+    //SDL_ShowCursor(0);
     return app.start();
 }
