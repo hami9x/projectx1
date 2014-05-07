@@ -9,16 +9,17 @@ message PlayerChange {
 }
 
 message PlayerUpdate {
-  required float angle = 1;
-  required float posX = 2;
-  required float posY = 3;
-  required float velX = 4;
-  required float velY = 5;
+  required int32 player = 1;
+  required float angle = 2;
+  required float posx = 3;
+  required float posy = 4;
+  required float velx = 5;
+  required float vely = 6;
 }
 
 message Update {
   required int32 time = 1;
-  optional PlayerUpdate player = 2;
+  repeated PlayerUpdate players = 2;
 }
 
 option optimize_for=LITE_RUNTIME;

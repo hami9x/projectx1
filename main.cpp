@@ -205,9 +205,9 @@ class Application {
         ENetHost * client;
         client = enet_host_create(NULL /* create a client host */,
                     1 /* only allow 1 outgoing connection */,
-                    2 /* allow up 2 channels to be used, 0 and 1 */,
-                    0 /* 56K modem with 56 Kbps downstream bandwidth */,
-                    0 /* 56K modem with 14 Kbps upstream bandwidth */);
+                    10,
+                    0,
+                    0);
         if (client == NULL)
         {
             fprintf(stderr,
@@ -221,7 +221,7 @@ class Application {
         enet_address_set_host (&address, "localhost");
         address.port = 5555;
         /* Initiate the connection, allocating the two channels 0 and 1. */
-        host = enet_host_connect (client, &address, 2, 0);
+        host = enet_host_connect (client, &address, 10, 0);
         if (host == NULL)
         {
            fprintf (stderr,
@@ -229,7 +229,7 @@ class Application {
            exit (EXIT_FAILURE);
         }
 
-        if (enet_host_service (client, & event, 5000) > 0 &&
+        if (enet_host_service (client, &event, 5000) > 0 &&
             event.type == ENET_EVENT_TYPE_CONNECT)
         {
             printf ("Connection to localhost:5555 succeeded.\n");
@@ -245,11 +245,10 @@ class Application {
         }
 
         int playerId = -1;
-        enet_host_service (client, & event, 5000);
+        enet_host_service (client, &event, 5000);
         if (event.type == ENET_EVENT_TYPE_RECEIVE && event.channelID == 0 && event.packet->data != NULL) {
-            string message((char*)event.packet->data);
             ClientInfo ci;
-            ci.ParseFromString(message);
+            ci.ParseFromArray(event.packet->data, event.packet->dataLength);
             playerId = ci.player();
             enet_packet_destroy (event.packet);
         } else {
@@ -334,17 +333,22 @@ class Application {
         SDL_Event e;
 
         cpFloat timeStep = 1.0/60.0;
-        cpFloat updateInterval = 1.0/20.0;
+        cpFloat updateInterval = 1;
         cpFloat updateTime = 0;
         cpFloat fireTime = 0;
+        long int timeIdx = 0;
 
         glClearColor(1, 1, 1, 1);
 
         PlayerChange pc;
+        ENetEvent evt;
+        void *buffer = NULL;
+        int size = 0;
 
         //While application is running
         while( !quit )
         {
+            pc.mutable_move()->set_angle(cpBodyGetAngle(p1.body()));
             //Handle events on queue
             while( SDL_PollEvent( &e ) != 0 )
             {
@@ -364,30 +368,38 @@ class Application {
             updateTime += timeStep;
             if (updateTime >= updateInterval) {
                 updateTime -= updateInterval;
-                pc.set_time(now());
-                string message = pc.SerializeAsString();
-                ENetPacket * packet = enet_packet_create(message.c_str(), message.size()+1, 0);
+                pc.set_time(timeIdx++);
+                size = pc.ByteSize();
+                buffer = malloc(size);
+                pc.SerializeToArray(buffer, size);
+                ENetPacket * packet = enet_packet_create(buffer, size+1, 0);
                 enet_peer_send(host, 1, packet);
                 pc.Clear();
+                free(buffer);
             }
             p1.handleFire(mRenderer, space, fireTime);
-             enet_host_service (client, &event, 0);
+            enet_host_service(client, &evt, 0);
 
-            if (event.type == ENET_EVENT_TYPE_RECEIVE)
+            if (evt.type == ENET_EVENT_TYPE_RECEIVE && evt.packet->data != NULL)
             {
-                    printf ("A packet of length %u was received from %d on channel %u.\n",
-                    event.packet -> dataLength,
-                    (int)event.peer -> data,
-                    event.channelID);
-            {
-                PlayerUpdate pu;
-                pu.ParseFromString(std::string((char*)event.packet->data));
-                Player *p=event.channelID==0?&p1:&p2;
-                if (cpBodyGetAngle(p->body())!=pu.angle()) printf("Incorrect angle !:%f\n",pu.angle());
-                //cpBodySetAngle(p->body(),pu.angle());
-                p->setMove(cpv(pu.velx(),pu.vely()));
-                printf("Player : %u , Pos(%lf,%lf) , vel(%lf,%lf) \n",event.channelID,pu.posx(),pu.posy(),pu.velx(),pu.vely());
-            }
+                printf ("A packet of length %u was received from %d on channel %u.\n",
+                evt.packet->dataLength,
+                (int)evt.peer->data,
+                evt.channelID);
+                Update u;
+                google::protobuf::RepeatedPtrField<PlayerUpdate>::iterator ii;
+                u.ParseFromArray(evt.packet->data, evt.packet->dataLength);
+                google::protobuf::RepeatedPtrField<PlayerUpdate> pus = u.players();
+                for (ii = pus.begin(); ii != pus.end(); ++ii) {
+                    PlayerUpdate pu = *ii;
+                    Player *p = (pu.player() == 1) ? &p1 : &p2;
+                    cpVect pos = cpBodyGetPosition(p->body());
+                    printf("Player : %u , Pos(%f,%f) vs (%f, %f) , vel(%f,%f), angle(%f) vs (%f) \n",pu.player(),pu.posx(),pu.posy(), pos.x, pos.y, pu.velx(),pu.vely(), pu.angle(), cpBodyGetAngle(p->body()));
+                    //cpBodySetAngle(p->body(),pu.angle());
+                    cpBodySetVelocity(p->body(), cpv(pu.velx(), pu.vely()));
+                    cpBodySetPosition(p->body(), cpv(pu.posx(), pu.posy()));
+                }
+                enet_packet_destroy (evt.packet);
             }
             //Move the aircraft
             p1.fly();

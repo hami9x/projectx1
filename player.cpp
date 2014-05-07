@@ -114,7 +114,6 @@ namespace xx {
     void Player::fly() {
         //Apply impulse
         cpBodyApplyImpulseAtLocalPoint(mEntity->body(), mVel, cpv(0, 0));
-        printf("Vel(%f,%f)\n",cpBodyGetVelocity(mEntity->body()).x,cpBodyGetVelocity(mEntity->body()).y);
         cpBody * body = mEntity->body();
         for(int i=0; i<=maxAmmo; i++)
             if( ammo[i].checkExist() )
