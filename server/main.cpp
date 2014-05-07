@@ -130,7 +130,7 @@ int main(int argc, char* args[])
                        cpBodyGetPosition(p->body()).x,
                        cpBodyGetPosition(p->body()).y,
                        cpBodyGetVelocity(p->body()).x,
-                       cpBodyGetPosition(p->body()).y);
+                       cpBodyGetVelocity(p->body()).y);
             }
             /* Clean up the packet now that we're done using it. */
             enet_packet_destroy (event.packet);
