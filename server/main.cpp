@@ -2,7 +2,6 @@
 #include <enet/enet.h>
 #include <chipmunk_private.h>
 #include <SDL.h>
-#include <ctime>
 
 #include "global.h"
 #include "player.h"
@@ -11,8 +10,6 @@
 
 using namespace std;
 using namespace xx;
-
-#define CLOCKS_PER_MSEC CLOCKS_PER_SEC/1000
 
 int main(int argc, char* args[])
 {
@@ -44,13 +41,15 @@ int main(int argc, char* args[])
         players[i] = Player(playerEnts[i]);
     }
 
+    vector<bool> connected(playerEnts.size()+1, false);
+
     ENetAddress address;
     ENetHost * server;
     address.host = ENET_HOST_ANY;
     address.port = 5555;
     server = enet_host_create (&address /* the address to bind the server host to */,
                                  2      /* allow up to 32 clients and/or outgoing connections */,
-                                  2      /* allow up to 2 channels to be used, 0 and 1 */,
+                                  10      ,
                                   0      /* assume any amount of incoming bandwidth */,
                                   0      /* assume any amount of outgoing bandwidth */);
     if (server == NULL)
@@ -64,38 +63,55 @@ int main(int argc, char* args[])
     ENetEvent event;
     int clientId = 1;
 
-    std::clock_t start;
-    double duration;
+    cpFloat updateInterval = 1.0/10.0;
+    cpFloat updateTime = 0;
+    cpFloat timeStep = 1.0/20.;
 
-    start = std::clock();
+    ENetPeer * peers[3];
     while (1)
     {
-        printf("%d\n",start);
-        duration = (std::clock() - start) / (double)CLOCKS_PER_MSEC;
-        if (duration >= 0) {
-            start = std::clock();
+        cpSpaceStep(space, timeStep);
+        updateTime += timeStep;
+        int size;
+        void *buffer;
+        if (updateTime >= updateInterval) {
+            updateTime -= updateInterval;
+            Update u;
+            u.set_time(enet_time_get());
+
             for (size_t i=0; i<players.size(); ++i) {
+                if (!connected[i]) {
+                    continue;
+                }
                 Player * player = &players[i];
                 PlayerUpdate pu;
                 pu.set_angle(cpBodyGetAngle(player->body()));
+                printf("%f :)\n", cpBodyGetAngle(player->body()));
                 cpVect pos = cpBodyGetPosition(player->body());
                 cpVect vel = cpBodyGetVelocity(player->body());
-                pu.set_posx(100);
-                pu.set_posy(100);
+                pu.set_player(i+1);
+                pu.set_posx(pos.x);
+                pu.set_posy(pos.y);
                 pu.set_velx(vel.x);
                 pu.set_vely(vel.y);
-                string pus = pu.SerializeAsString();
-                enet_host_broadcast(server,i, enet_packet_create(pus.c_str(), pus.size()+1, 0));
-                printf("Broadcast Player %u , pos(%f,%f) , vel(%f,%f)\n",i+1,pu.posx(),pu.posy(),pu.velx(),pu.vely());
+                *u.add_players() = pu;
             }
+
+            size = u.ByteSize();
+            buffer = malloc(size);
+            u.SerializeToArray(buffer, size);
+            enet_host_broadcast(server, 4, enet_packet_create(buffer, size+1, 0));
+            //printf("Broadcast Player %u , pos(%f,%f) , vel(%f,%f)\n",i+1,pu.posx(),pu.posy(),pu.velx(),pu.vely());
+            free(buffer);
         }
 
-        if (enet_host_service (server, &event, 10000) <= 0) {
+        if (enet_host_service (server, &event, 200) <= 0) {
             continue;
         }
 
         ClientInfo ci;
-        string infstr;
+        PlayerUpdate pu;
+        ENetPacket * packet;
         switch (event.type)
         {
         case ENET_EVENT_TYPE_CONNECT:
@@ -104,9 +120,19 @@ int main(int argc, char* args[])
                     event.peer -> address.port);
             /* Store any relevant client information here. */
             event.peer->data = (void*)clientId;
-            ci.set_player(clientId == 1 || clientId == 2 ? clientId : 0);
-            infstr = string(ci.SerializeAsString());
-            enet_peer_send(event.peer, 0, enet_packet_create(infstr.c_str(), infstr.size()+1, 0));
+            if (clientId == 1 || clientId == 2) {
+                connected[clientId-1] = true;
+                ci.set_player(clientId);
+            } else {
+                ci.set_player(0);
+            }
+
+            size = ci.ByteSize();
+            buffer = malloc(size);
+            ci.SerializeToArray(buffer, size);
+            enet_peer_send(event.peer, 0, enet_packet_create(buffer, size+1, 0));
+            free(buffer);
+            peers[0] = event.peer;
             clientId++;
             break;
         case ENET_EVENT_TYPE_RECEIVE:
@@ -118,19 +144,21 @@ int main(int argc, char* args[])
                 int playerId = (int)event.peer->data;
                 Player *p = &players[playerId-1];
                 PlayerChange pc;
-                pc.ParseFromString(std::string((char*)event.packet->data));
-                if (lastUpdated[playerId] < pc.time()) {
+                pc.ParseFromString(string((char*)event.packet->data));
+                if (lastUpdated[playerId] < pc.time() || pc.time() == 0) {
                     lastUpdated[playerId] = pc.time();
                     PlayerMove m = pc.move();
                     cpBodySetAngle(p->body(), m.angle());
                     p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
                     p->fly();
+                    printf("Receive Player at time %u: %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), playerId,
+                        cpBodyGetPosition(p->body()).x,
+                        cpBodyGetPosition(p->body()).y,
+                        cpBodyGetVelocity(p->body()).x,
+                        cpBodyGetPosition(p->body()).y,
+                        cpBodyGetAngle(p->body())
+                    );
                 }
-                printf("Receive Player %d , pos(%f,%f) , vel(%f,%f)\n",playerId,
-                       cpBodyGetPosition(p->body()).x,
-                       cpBodyGetPosition(p->body()).y,
-                       cpBodyGetVelocity(p->body()).x,
-                       cpBodyGetPosition(p->body()).y);
             }
             /* Clean up the packet now that we're done using it. */
             enet_packet_destroy (event.packet);
@@ -138,7 +166,7 @@ int main(int argc, char* args[])
             break;
 
         case ENET_EVENT_TYPE_DISCONNECT:
-            printf ("%d disconnected.\n", (char*)event.peer->data);
+            printf ("%d disconnected.\n", (int)event.peer->data);
             /* Reset the peer's client information. */
             event.peer -> data = NULL;
         }

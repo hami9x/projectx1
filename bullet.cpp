@@ -42,7 +42,7 @@ void Bullet::free() {
 void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataPointer p) {
 
     Player *player = (Player*)p;
-    printf("in bullet %d\n", player);
+    //printf("in bullet %d\n", player);
     mVelX = player->velX();
     mVelY = player->velY();
     mAngle = player->angle();
@@ -58,7 +58,7 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
     mBody->p.y = mPosY;
 
 
-    printf("%d \n",mBody->userData);
+    //printf("%d \n",mBody->userData);
 
     cpBodySetCenterOfGravity(mBody, cpv(img.width()/2, img.height()/2));
     cpShape *shape;
