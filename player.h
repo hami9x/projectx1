@@ -14,7 +14,7 @@ class Player {
     public:
 
         //Maximum velocity
-        constexpr static double PLAYER_VEL=10;
+        constexpr static double PLAYER_VEL=30;
 
         constexpr static int sWidth=SCREEN_WIDTH;
         constexpr static int sHeight=SCREEN_HEIGHT;

@@ -66,7 +66,6 @@ namespace xx {
         } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_RIGHT ) {
                 Rpressed = false;
                 mVel = cpvzero;
-                m->set_forwards(0);
         }
 
         //if holding the right button

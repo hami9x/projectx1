@@ -12,12 +12,13 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-std=c++11" />
 					<Add option="-g" />
+					<Add option="-DGLEW_STATIC" />
 					<Add directory="../vendor/tinyxml" />
 					<Add directory="../" />
 					<Add directory="../vendor/tmxparser/src" />
 					<Add directory="../../x1-deps/include" />
+					<Add directory="../cpDebugDraw" />
 				</Compiler>
 				<Linker>
 					<Add directory="../../x1-deps" />
@@ -37,14 +38,24 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-std=c++11" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add option="-DPROTOBUF_USE_DLLS" />
 			<Add directory=".." />
 		</Compiler>
 		<Linker>
-			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lchipmunk -lenet -lprotobuf" />
+			<Add option="-lmingw32 -lglew32s -lopengl32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
+			<Add option="-lchipmunk -lSDLU -lenet -lprotobuf" />
 		</Linker>
 		<Unit filename="../bullet.cpp" />
+		<Unit filename="../cpDebugDraw/ChipmunkDebugDraw.cpp">
+			<Option weight="56" />
+		</Unit>
+		<Unit filename="../cpDebugDraw/ChipmunkDebugDraw.h" />
+		<Unit filename="../cpDebugDraw/DebugDrawImpl.cpp">
+			<Option weight="60" />
+		</Unit>
 		<Unit filename="../entity.cpp" />
 		<Unit filename="../entity.h" />
 		<Unit filename="../global.h" />
@@ -59,7 +70,9 @@
 		<Unit filename="../vendor/tinyxml/tinyxml2.h" />
 		<Unit filename="../vendor/tmxparser/src/tmxparser.cpp" />
 		<Unit filename="../vendor/tmxparser/src/tmxparser.h" />
-		<Unit filename="main.cpp" />
+		<Unit filename="main.cpp">
+			<Option weight="100" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<envvars />
