@@ -42,13 +42,19 @@ namespace xx {
     }
 
     cpVect Player::vectorForward() {
-        cpFloat vx = sin(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
-        cpFloat vy = -cos(cpBodyGetAngle(mEntity->body())*M_PI/180)*PLAYER_VEL;
+        cpFloat vx = sin(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
+        cpFloat vy = -cos(cpBodyGetAngle(mEntity->body()))*PLAYER_VEL;
         return cpv(vx, vy);
     }
 
-    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, PlayerChange *pc) {
-        PlayerMove *m = pc->mutable_move();
+    void Player::rightPressCheck(cpVect & moveVect) {
+        if (Rpressed) {
+            mVel = vectorForward();
+            moveVect = cpvadd(moveVect, vect(PLAYER_VEL, cpBodyGetAngle(mEntity->body())));
+        }
+    }
+
+    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect) {
         //Rotation
         if( e.type == SDL_MOUSEMOTION) {
             int x,y;
@@ -58,7 +64,6 @@ namespace xx {
             if( x>1 )
                 rotRight();
         }
-        m->set_angle(cpBodyGetAngle(body()));
 
         //If the right button was pressed
         if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_RIGHT ) {
@@ -68,11 +73,6 @@ namespace xx {
                 mVel = cpvzero;
         }
 
-        //if holding the right button
-        if (Rpressed) {
-            mVel = vectorForward();
-            m->set_forwards(m->forwards()+1);
-        }
         //If the left button was pressed
         if ( e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT ) {
             Lpressed = true;
@@ -112,7 +112,7 @@ namespace xx {
 
     void Player::fly() {
         //Apply impulse
-        cpBodyApplyImpulseAtLocalPoint(mEntity->body(), mVel, cpv(0, 0));
+        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), mVel, cpv(0, 0));
         cpBody * body = mEntity->body();
         for(int i=0; i<=maxAmmo; i++)
             if( ammo[i].checkExist() )

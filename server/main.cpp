@@ -110,7 +110,7 @@ int main(int argc, char* args[])
     int clientId = 1;
 
     cpFloat timeStep = 1.0/60.;
-    cpFloat updateInterval = 100;
+    cpFloat updateInterval = 10;
     enet_uint32 updatedTime = enet_time_get();
 
     ENetPeer * peers[3];
@@ -130,7 +130,7 @@ int main(int argc, char* args[])
         void *buffer;
         enet_uint32 now = enet_time_get();
         if (now - updatedTime >= updateInterval) {
-            printf("Interval: %u\n", now-updatedTime);
+            //printf("Interval: %u\n", now-updatedTime);
             updatedTime = now;
             Update u;
             u.set_time(now);
@@ -213,17 +213,16 @@ int main(int argc, char* args[])
                 int playerId = (int)event.peer->data;
                 Player *p = &players[playerId-1];
                 PlayerChange pc;
-                pc.ParseFromString(string((char*)event.packet->data));
+                pc.ParseFromArray(event.packet->data, event.packet->dataLength);
                 if (lastUpdated[playerId] < pc.time() || pc.time() == 0) {
                     lastUpdated[playerId] = pc.time();
                     PlayerMove m = pc.move();
-                    cpBodySetAngle(p->body(), m.angle());
-                    for (int i=0; i< m.forwards(); i++) {
-                        p->setMove(p->vectorForward());
-                        //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
-                        p->fly();
-                    }
-                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), m.forwards(), playerId,
+                    printf(":::::%f %f\n", m.mvectx(), m.mvecty());
+                    p->setMove(cpv(m.mvectx(), m.mvecty()));
+                    //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
+                    p->fly();
+                    cpBodySetAngle(p->body(), pc.angle());
+                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), 0, playerId,
                         cpBodyGetPosition(p->body()).x,
                         cpBodyGetPosition(p->body()).y,
                         cpBodyGetVelocity(p->body()).x,

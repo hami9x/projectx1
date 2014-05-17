@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <ctime>
+#include <chipmunk_private.h>
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 1000;
@@ -25,6 +26,12 @@ inline double deg2rad(double degs) {
 
 inline std::time_t now() {
     return std::time(0)-ROOT_TIMESTAMP;
+}
+
+inline cpVect vect(double vel, double angle) {
+    cpFloat vx = sin(angle)*vel;
+    cpFloat vy = -cos(angle)*vel;
+    return cpv(vx, vy);
 }
 
 #endif // DEFS_H_INCLUDED

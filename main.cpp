@@ -333,7 +333,7 @@ class Application {
         SDL_Event e;
 
         cpFloat timeStep = 1.0/60.0;
-        cpFloat updateInterval = 1;
+        cpFloat updateInterval = 100;
         cpFloat updateTime = 0;
         cpFloat fireTime = 0;
 
@@ -343,11 +343,13 @@ class Application {
         ENetEvent evt;
         void *buffer = NULL;
         int size = 0;
+        cpVect mvVect = cpvzero;
+        enet_uint32 lastUpdate = 0;
+        srand(time(NULL));
 
         //While application is running
         while( !quit )
         {
-            pc.mutable_move()->set_angle(cpBodyGetAngle(p1.body()));
             //Handle events on queue
             while( SDL_PollEvent( &e ) != 0 )
             {
@@ -358,21 +360,33 @@ class Application {
                 }
                 else
                 {
-                    p1.handleEvent(e, mRenderer, space, &pc);
+                    p1.handleEvent(e, mRenderer, space, mvVect);
                 }
             }
+            p1.rightPressCheck(mvVect);
 
             //Firing
             fireTime += timeStep;
-            updateTime += timeStep;
-            if (updateTime >= updateInterval) {
-                updateTime -= updateInterval;
+            enet_uint32 now = enet_time_get();
+            if (now-lastUpdate >= updateInterval) {
+                lastUpdate = now;
                 pc.set_time(enet_time_get());
+                pc.set_angle(cpBodyGetAngle(p1.body()));
+                float tx = mvVect.x*0.3;
+                float ty = mvVect.y*0.3;
+                PlayerMove *m = pc.mutable_move();
+                m->set_mvectx(tx);
+                m->set_mvecty(ty);
+//                if (mvVect.x != 0 || mvVect.y != 0) {
+//                    //printf("::%f %f\n", pc.move().mvectx(), pc.move().mvecty());
+//                }
+
                 size = pc.ByteSize();
                 buffer = malloc(size);
                 pc.SerializeToArray(buffer, size);
                 ENetPacket * packet = enet_packet_create(buffer, size+1, 0);
                 enet_peer_send(host, 1, packet);
+                mvVect = cpvzero;
                 pc.Clear();
                 free(buffer);
             }
@@ -381,10 +395,10 @@ class Application {
 
             if (evt.type == ENET_EVENT_TYPE_RECEIVE && evt.packet->data != NULL)
             {
-                printf ("A packet of length %u was received from %d on channel %u.\n",
-                evt.packet->dataLength,
-                (int)evt.peer->data,
-                evt.channelID);
+//                printf ("A packet of length %u was received from %d on channel %u.\n",
+//                evt.packet->dataLength,
+//                (int)evt.peer->data,
+//                evt.channelID);
                 Update u;
                 google::protobuf::RepeatedPtrField<PlayerUpdate>::iterator ii;
                 u.ParseFromArray(evt.packet->data, evt.packet->dataLength);
@@ -393,9 +407,9 @@ class Application {
                     PlayerUpdate pu = *ii;
                     Player *p = (pu.player() == playerId) ? &p1 : &p2;
                     cpVect pos = cpBodyGetPosition(p->body());
-                    printf("Offset time %u\n", enet_time_get()-u.time());
-                    printf("Player : %u , Pos(%f,%f) vs (%f, %f) , vel(%f,%f), angle(%f) vs (%f) \n",pu.player(),pu.posx(),pu.posy(), pos.x, pos.y, pu.velx(),pu.vely(), pu.angle(), cpBodyGetAngle(p->body()));
-                    //cpBodySetAngle(p->body(),pu.angle());
+//                    printf("Offset time %u\n", enet_time_get()-u.time());
+//                    printf("Player : %u , Pos(%f,%f) vs (%f, %f) , vel(%f,%f), angle(%f) vs (%f) \n",pu.player(),pu.posx(),pu.posy(), pos.x, pos.y, pu.velx(),pu.vely(), pu.angle(), cpBodyGetAngle(p->body()));
+//                    cpBodySetAngle(p->body(), pu.angle());
                     cpBodySetVelocity(p->body(), cpv(pu.velx(), pu.vely()));
                     cpFloat angle = cpBodyGetAngle(p->body());
                     cpBodySetAngle(p->body(), pu.angle());

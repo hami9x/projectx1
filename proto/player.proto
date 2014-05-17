@@ -1,11 +1,12 @@
 message PlayerMove {
-  required float angle = 2;
-  optional int32 forwards = 3;
+  required float mvectx = 2;
+  required float mvecty = 3;
 }
 
 message PlayerChange {
   required int32 time = 1;
-  optional PlayerMove move = 2;
+  required int32 angle = 2;
+  optional PlayerMove move = 3;
 }
 
 message PlayerUpdate {
