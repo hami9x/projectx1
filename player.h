@@ -14,7 +14,7 @@ class Player {
     public:
 
         //Maximum velocity
-        constexpr static double PLAYER_VEL=10;
+        constexpr static double PLAYER_VEL=30;
 
         constexpr static int sWidth=SCREEN_WIDTH;
         constexpr static int sHeight=SCREEN_HEIGHT;
@@ -32,9 +32,11 @@ class Player {
         void render(SDL_Renderer *r);
 
         //Event Handler
-        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, PlayerChange *pc);
+        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect);
 
         void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time);
+
+        void rightPressCheck(cpVect & moveVect);
 
         //Move the aircraft
         void fly();

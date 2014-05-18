@@ -39,7 +39,6 @@
 		<Linker>
 			<Add option="-lmingw32 -lglew32s -lopengl32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
 			<Add option="-lchipmunk -lSDLU -lenet -lprotobuf" />
-			<Add directory="D:/mingw_lib/lib" />
 			<Add directory="../x1-deps" />
 		</Linker>
 		<Unit filename="NovaSquare.ttf" />
