@@ -5,7 +5,7 @@ message PlayerMove {
 
 message PlayerChange {
   required int32 time = 1;
-  required int32 angle = 2;
+  required float angle = 2;
   optional PlayerMove move = 3;
 }
 

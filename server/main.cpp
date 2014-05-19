@@ -101,7 +101,7 @@ int main(int argc, char* args[])
     if (server == NULL)
     {
         fprintf (stderr,
-                 "An error occurred while trying to create an ENet server host.\n");
+                 "An error ocurred while trying to create an ENet server host.\n");
         exit (EXIT_FAILURE);
     }
 
@@ -110,7 +110,7 @@ int main(int argc, char* args[])
     int clientId = 1;
 
     cpFloat timeStep = 1.0/60.;
-    cpFloat updateInterval = 10;
+    cpFloat updateInterval = 100;
     enet_uint32 updatedTime = enet_time_get();
 
     ENetPeer * peers[3];
@@ -184,9 +184,9 @@ int main(int argc, char* args[])
         switch (event.type)
         {
         case ENET_EVENT_TYPE_CONNECT:
-            printf ("A new client connected from %x:%u.\n",
-                    event.peer -> address.host,
-                    event.peer -> address.port);
+//            printf ("A new client connected from %x:%u.\n",
+//                    event.peer -> address.host,
+//                    event.peer -> address.port);
             /* Store any relevant client information here. */
             event.peer->data = (void*)clientId;
             if (clientId == 1 || clientId == 2) {
@@ -205,10 +205,10 @@ int main(int argc, char* args[])
             clientId++;
             break;
         case ENET_EVENT_TYPE_RECEIVE:
-            printf ("A packet of length %u was received from %d on channel %u.\n",
-                    event.packet -> dataLength,
-                    (int)event.peer -> data,
-                    event.channelID);
+//            printf ("A packet of length %u was received from %d on channel %u.\n",
+//                    event.packet -> dataLength,
+//                    (int)event.peer -> data,
+//                    event.channelID);
             if (event.channelID == 1) {
                 int playerId = (int)event.peer->data;
                 Player *p = &players[playerId-1];
@@ -222,22 +222,14 @@ int main(int argc, char* args[])
                     //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
                     p->fly();
                     cpBodySetAngle(p->body(), pc.angle());
-                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), 0, playerId,
-                        cpBodyGetPosition(p->body()).x,
-                        cpBodyGetPosition(p->body()).y,
-                        cpBodyGetVelocity(p->body()).x,
-                        cpBodyGetPosition(p->body()).y,
-                        cpBodyGetAngle(p->body())
-                    );
+//                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), 0, playerId,
+//                        cpBodyGetPosition(p->body()).x,
+//                        cpBodyGetPosition(p->body()).y,
+//                        cpBodyGetVelocity(p->body()).x,
+//                        cpBodyGetVelocity(p->body()).y,
+//                        cpBodyGetAngle(p->body())
+//                    );
                 }
-<<<<<<< HEAD
-                printf("Receive Player %d , pos(%f,%f) , vel(%f,%f)\n",playerId,
-                       cpBodyGetPosition(p->body()).x,
-                       cpBodyGetPosition(p->body()).y,
-                       cpBodyGetVelocity(p->body()).x,
-                       cpBodyGetVelocity(p->body()).y);
-=======
->>>>>>> 83c74c513900f66fb36800528a5815648faf6b20
             }
             /* Clean up the packet now that we're done using it. */
             enet_packet_destroy (event.packet);

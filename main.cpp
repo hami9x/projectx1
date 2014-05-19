@@ -371,6 +371,7 @@ class Application {
             if (now-lastUpdate >= updateInterval) {
                 lastUpdate = now;
                 pc.set_time(enet_time_get());
+                printf("Send: %f\n",cpBodyGetAngle(p1.body()));
                 pc.set_angle(cpBodyGetAngle(p1.body()));
                 float tx = mvVect.x*0.3;
                 float ty = mvVect.y*0.3;
@@ -414,7 +415,8 @@ class Application {
                     cpFloat angle = cpBodyGetAngle(p->body());
                     cpBodySetAngle(p->body(), pu.angle());
                     cpBodySetPosition(p->body(), cpv(pu.posx(), pu.posy()));
-                    cpBodySetAngle(p->body(), angle);
+                    if (pu.player() == playerId )
+                            cpBodySetAngle(p->body(), angle);
                 }
                 enet_packet_destroy (evt.packet);
             }
