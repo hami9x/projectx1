@@ -339,12 +339,12 @@ class Application {
 
         glClearColor(1, 1, 1, 1);
 
-        PlayerChange pc;
         ENetEvent evt;
         void *buffer = NULL;
         int size = 0;
         cpVect mvVect = cpvzero;
         enet_uint32 lastUpdate = 0;
+        enet_uint32 lastRecvUpdate = 0;
         srand(time(NULL));
 
         //While application is running
@@ -369,26 +369,25 @@ class Application {
             fireTime += timeStep;
             enet_uint32 now = enet_time_get();
             if (now-lastUpdate >= updateInterval) {
+                PlayerChange pc;
                 lastUpdate = now;
                 pc.set_time(enet_time_get());
-                printf("Send: %f\n",cpBodyGetAngle(p1.body()));
+                //printf("Send: %f\n",cpBodyGetAngle(p1.body()));
                 pc.set_angle(cpBodyGetAngle(p1.body()));
-                float tx = mvVect.x*0.3;
-                float ty = mvVect.y*0.3;
                 PlayerMove *m = pc.mutable_move();
-                m->set_mvectx(tx);
-                m->set_mvecty(ty);
-//                if (mvVect.x != 0 || mvVect.y != 0) {
-//                    //printf("::%f %f\n", pc.move().mvectx(), pc.move().mvecty());
-//                }
+                m->set_mvectx(mvVect.x);
+                m->set_mvecty(mvVect.y);
 
                 size = pc.ByteSize();
                 buffer = malloc(size);
                 pc.SerializeToArray(buffer, size);
+                if (mvVect.x != 0 || mvVect.y != 0) {
+                    printf("::%f %f\n", pc.move().mvectx(), pc.move().mvecty());
+                }
                 ENetPacket * packet = enet_packet_create(buffer, size+1, 0);
                 enet_peer_send(host, 1, packet);
+                enet_host_service(client, &evt, 0);
                 mvVect = cpvzero;
-                pc.Clear();
                 free(buffer);
             }
             p1.handleFire(mRenderer, space, fireTime);
@@ -404,9 +403,15 @@ class Application {
                 google::protobuf::RepeatedPtrField<PlayerUpdate>::iterator ii;
                 u.ParseFromArray(evt.packet->data, evt.packet->dataLength);
                 google::protobuf::RepeatedPtrField<PlayerUpdate> pus = u.players();
+
+                if (u.time() <= lastRecvUpdate) {
+                    continue;
+                }
+                lastRecvUpdate = u.time();
                 for (ii = pus.begin(); ii != pus.end(); ++ii) {
                     PlayerUpdate pu = *ii;
                     Player *p = (pu.player() == playerId) ? &p1 : &p2;
+                    printf("Rec player: %d\n", playerId);
                     cpVect pos = cpBodyGetPosition(p->body());
 //                    printf("Offset time %u\n", enet_time_get()-u.time());
 //                    printf("Player : %u , Pos(%f,%f) vs (%f, %f) , vel(%f,%f), angle(%f) vs (%f) \n",pu.player(),pu.posx(),pu.posy(), pos.x, pos.y, pu.velx(),pu.vely(), pu.angle(), cpBodyGetAngle(p->body()));
@@ -415,8 +420,10 @@ class Application {
                     cpFloat angle = cpBodyGetAngle(p->body());
                     cpBodySetAngle(p->body(), pu.angle());
                     cpBodySetPosition(p->body(), cpv(pu.posx(), pu.posy()));
+                    cpFloat timeoffs = cpFloat(enet_time_get()-u.time())/1000.;
+                    cpSpaceStep(space, timeoffs);
                     if (pu.player() == playerId )
-                            cpBodySetAngle(p->body(), angle);
+                        cpBodySetAngle(p->body(), angle);
                 }
                 enet_packet_destroy (evt.packet);
             }

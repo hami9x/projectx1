@@ -105,7 +105,7 @@ int main(int argc, char* args[])
         exit (EXIT_FAILURE);
     }
 
-    vector<int> lastUpdated(players.size(), 0);
+    vector<int> lastUpdated(players.size()+1, 0);
     ENetEvent event;
     int clientId = 1;
 
@@ -113,7 +113,6 @@ int main(int argc, char* args[])
     cpFloat updateInterval = 100;
     enet_uint32 updatedTime = enet_time_get();
 
-    ENetPeer * peers[3];
     SDL_Event e;
     ChipmunkDebugDrawInit();
     while (1)
@@ -201,7 +200,6 @@ int main(int argc, char* args[])
             ci.SerializeToArray(buffer, size);
             enet_peer_send(event.peer, 0, enet_packet_create(buffer, size+1, 0));
             free(buffer);
-            peers[0] = event.peer;
             clientId++;
             break;
         case ENET_EVENT_TYPE_RECEIVE:
@@ -217,7 +215,7 @@ int main(int argc, char* args[])
                 if (lastUpdated[playerId] < pc.time() || pc.time() == 0) {
                     lastUpdated[playerId] = pc.time();
                     PlayerMove m = pc.move();
-                    printf(":::::%f %f\n", m.mvectx(), m.mvecty());
+                    printf("::::: %d | %f %f\n", playerId, m.mvectx(), m.mvecty());
                     p->setMove(cpv(m.mvectx(), m.mvecty()));
                     //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
                     p->fly();
