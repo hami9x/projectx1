@@ -337,7 +337,10 @@ class Application {
             cpSpaceStep(space, timeStep);
             drawPlayerHp(p1, mRenderer,0,0,assets.defFont());
             drawPlayerHp(p1, mRenderer,666,0,assets.defFont());
-            //aacircleColor(mRenderer, 100, 50, 300, 0x80a8f2);
+
+            //Demo draw from SDL2_gfx
+            //filledPieRGBA(mRenderer, 200, 200, 200, 0, 70, 100, 200, 100, 255);
+
             SDL_RenderPresent(mRenderer);
 
             SDLU_GL_RenderCacheState(mRenderer);
