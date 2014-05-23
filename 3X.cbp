@@ -37,7 +37,7 @@
 			<Add directory="../x1-deps/include" />
 		</Compiler>
 		<Linker>
-			<Add option="-lmingw32 -lglew32s -lopengl32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
+			<Add option="-lmingw32 -lglew32s -lopengl32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_gfx" />
 			<Add option="-lchipmunk -lSDLU -lenet -lprotobuf" />
 			<Add directory="../x1-deps" />
 		</Linker>

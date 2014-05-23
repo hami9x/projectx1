@@ -22,7 +22,9 @@ namespace xx {
     }
 
     void Player::render(SDL_Renderer *r) {
-
+        if (mInCloud) {
+            hurt(mInCloud);
+        }
         for(int i=0; i<=maxAmmo; i++)
         {
             if( ammo[i].checkExist() )
@@ -135,4 +137,7 @@ namespace xx {
         }
     }
 
+    void Player::setInCloud(int num) {
+        mInCloud += num;
+    }
 }

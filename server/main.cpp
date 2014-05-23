@@ -8,6 +8,7 @@
 
 #include "global.h"
 #include "player.h"
+#include "ops.h"
 #include "proto/player.pb.h"
 #include "proto/clientinfo.pb.h"
 
@@ -85,6 +86,7 @@ int main(int argc, char* args[])
     vector<Player> players(playerEnts.size());
     for (size_t i=0; i<playerEnts.size(); i++) {
         players[i] = Player(playerEnts[i]);
+        setupCollisions(space, &players[i]);
     }
 
     vector<bool> connected(playerEnts.size()+1, false);
@@ -114,6 +116,7 @@ int main(int argc, char* args[])
     enet_uint32 updatedTime = enet_time_get();
 
     SDL_Event e;
+    //collision
     ChipmunkDebugDrawInit();
     while (1)
     {
@@ -239,6 +242,8 @@ int main(int argc, char* args[])
             /* Reset the peer's client information. */
             event.peer -> data = NULL;
         }
+
+        Sleep(5);
     }
 
     enet_host_destroy(server);

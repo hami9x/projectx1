@@ -38,6 +38,8 @@ class Player {
 
         void rightPressCheck(cpVect & moveVect);
 
+        void setInCloud(int);
+
         //Move the aircraft
         void fly();
 
@@ -60,7 +62,7 @@ class Player {
         cpVect vectorForward();
 
         //in Cloud
-        int inCloud=0;
+        int mInCloud=0;
 
         //Getter
         double velX() { return sin( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
