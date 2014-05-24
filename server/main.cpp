@@ -118,6 +118,7 @@ int main(int argc, char* args[])
     SDL_Event e;
     //collision
     ChipmunkDebugDrawInit();
+
     while (1)
     {
         while( SDL_PollEvent( &e ) != 0 )
@@ -218,7 +219,7 @@ int main(int argc, char* args[])
                 if (lastUpdated[playerId] < pc.time() || pc.time() == 0) {
                     lastUpdated[playerId] = pc.time();
                     PlayerMove m = pc.move();
-                    printf("::::: %d | %f %f\n", playerId, m.mvectx(), m.mvecty());
+                    //printf("::::: %d | %f %f\n", playerId, m.mvectx(), m.mvecty());
                     p->setMove(cpv(m.mvectx(), m.mvecty()));
                     //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
                     p->fly();

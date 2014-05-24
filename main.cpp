@@ -222,6 +222,8 @@ class Application {
         srand(time(NULL));
         //collision
         setupCollisions(space, &p1);
+        enet_uint32 lastTimeUpd = enet_time_get();
+        enet_uint32 ftavg = 20;
 
         //While application is running
         while( !quit )
@@ -288,29 +290,38 @@ class Application {
                     PlayerUpdate pu = *ii;
                     Player *p = (pu.player() == playerId) ? &p1 : &p2;
                     //printf("Rec player: %d\n", playerId);
-                    cpVect pos = cpBodyGetPosition(p->body());
                     //printf("Offset time %u\n", enet_time_get()-u.time());
 //                    printf("Player : %u , Pos(%f,%f) vs (%f, %f) , vel(%f,%f), angle(%f) vs (%f) \n",pu.player(),pu.posx(),pu.posy(), pos.x, pos.y, pu.velx(),pu.vely(), pu.angle(), cpBodyGetAngle(p->body()));
 //                    cpBodySetAngle(p->body(), pu.angle());
                     cpBodySetVelocity(p->body(), cpv(pu.velx(), pu.vely()));
+                    cpVect svpos = cpv(pu.posx(), pu.posy());
                     cpFloat angle = cpBodyGetAngle(p->body());
                     cpBodySetAngle(p->body(), pu.angle());
-                    cpVect svpos = cpv(pu.posx(), pu.posy());
-                    cpFloat timeoffs = cpFloat(enet_time_get()-u.time())/1000.;
-                    cpFloat dist = cpvdist(svpos, pos);
-                    if (dist >= 100) {
+                    if (pu.player() != playerId) {
                         cpBodySetPosition(p->body(), svpos);
-                        cpSpaceStep(space, timeoffs);
-                    } else if (dist >= 5) {
+                        continue;
+                    }
+                    cpVect pos = cpBodyGetPosition(p->body());
+                    cpFloat timeoffs = enet_time_get()-u.time();
+                    cpFloat dist = cpvdist(svpos, pos);
+                    //printf("dist>> %f\n", dist);
+
+                    if (dist >= 100) {
+                        //cpBodySetAngle(p->body(), (pu.angle() + angle)/2.);
+                        cpBodySetPosition(p->body(), svpos);
+                        cpSpaceStep(space, timeStep*(timeoffs/ftavg));
+                        cpBodySetAngle(p->body(), pu.angle());
+                        cpVect pos2 = cpBodyGetPosition(p->body());
+                        //printf(">>> %f <<<\n", cpvdist(pos, pos2));
+                        //printf("%f<< \n", timeStep*(timeoffs/ftavg));
+                    } else if (dist >= 20) {
                         cpVect offs = cpvsub(svpos, pos);
                         cpVect vel = cpBodyGetVelocity(p->body());
-                        cpBodySetVelocity(p->body(), cpvmult(offs, 1./cpvlength(offs)));
-                        cpSpaceStep(space, timeoffs/3.);
+                        cpBodySetVelocity(p->body(), cpvmult(offs, 1./5.));
+                        cpSpaceStep(space, 1);
                         cpBodySetVelocity(p->body(), vel);
                     }
-                    if (pu.player() == playerId ) {
-                        cpBodySetAngle(p->body(), angle);
-                    }
+                    cpBodySetAngle(p->body(), angle);
                 }
                 enet_packet_destroy (evt.packet);
             }
@@ -353,7 +364,12 @@ class Application {
             glShadeModel(GL_FLAT);      /* restore state */
             SDLU_GL_RenderRestoreState(mRenderer);
 
-            Sleep(5);
+            Sleep(10);
+
+            enet_uint32 ftime = enet_time_get() - lastTimeUpd;
+            ftavg = !ftavg ? ftime : (4*ftavg + ftime)/5;
+            //printf("ftime: %d\n",ftavg);
+            lastTimeUpd = enet_time_get();
         }
         ChipmunkDebugDrawCleanup();
         Entity::freeAll(players, space);

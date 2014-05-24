@@ -60,6 +60,8 @@
 		<Unit filename="../entity.h" />
 		<Unit filename="../global.h" />
 		<Unit filename="../map.tmx" />
+		<Unit filename="../ops.cpp" />
+		<Unit filename="../ops.h" />
 		<Unit filename="../player.cpp" />
 		<Unit filename="../proto/clientinfo.pb.cc" />
 		<Unit filename="../proto/clientinfo.pb.h" />

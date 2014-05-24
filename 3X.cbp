@@ -55,6 +55,10 @@
 			<Option weight="100" />
 		</Unit>
 		<Unit filename="map.tmx" />
+		<Unit filename="ops.cpp" />
+		<Unit filename="ops.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="player.cpp" />
 		<Unit filename="player.h" />
 		<Unit filename="proto/clientinfo.pb.cc" />
