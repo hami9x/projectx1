@@ -37,11 +37,12 @@ class Player {
         void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time);
 
         void rightPressCheck(cpVect & moveVect);
+        bool leftPressCheck() {return Lpressed;}
 
         void setInCloud(int);
 
         //Move the aircraft
-        void fly();
+        void updateState();
 
 
         //HP
@@ -65,12 +66,13 @@ class Player {
         int mInCloud=0;
 
         //Getter
-        double velX() { return sin( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
-        double velY() { return -cos( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
+        double velX() { return sin( cpBodyGetAngle( mEntity->body() ) ); }
+        double velY() { return -cos( cpBodyGetAngle( mEntity->body() ) ); }
         cpFloat posX() { return mEntity->body()->p.x; }
         cpFloat posY() { return mEntity->body()->p.y; }
-        cpFloat angle() { return mAngle; }
+        cpFloat angle() { return cpBodyGetAngle(mEntity->body()); }
         cpFloat sensor() { return mEntity->sprite().height()/2; }
+        int firedAmmo();
 
     private:
         //Velocity of player
@@ -93,6 +95,8 @@ class Player {
         //Maximum bullet
         int maxAmmo;
         Bullet ammo[10];
+
+        int firedNumber;
 };
 
 }

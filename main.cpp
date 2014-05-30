@@ -219,6 +219,7 @@ class Application {
         cpVect mvVect = cpvzero;
         enet_uint32 lastUpdate = 0;
         enet_uint32 lastRecvUpdate = 0;
+        enet_uint32 lastFrameTime = enet_time_get();
         srand(time(NULL));
         //collision
         setupCollisions(space, &p1);
@@ -226,6 +227,7 @@ class Application {
         //While application is running
         while( !quit )
         {
+            lastFrameTime = enet_time_get();
             //Handle events on queue
             while( SDL_PollEvent( &e ) != 0 )
             {
@@ -253,6 +255,7 @@ class Application {
                 PlayerMove *m = pc.mutable_move();
                 m->set_mvectx(mvVect.x);
                 m->set_mvecty(mvVect.y);
+                m->set_firenumber(p1.firedAmmo());
 
                 size = pc.ByteSize();
                 buffer = malloc(size);
@@ -266,7 +269,8 @@ class Application {
                 mvVect = cpvzero;
                 free(buffer);
             }
-            p1.handleFire(mRenderer, space, fireTime);
+            if(p1.leftPressCheck())
+                p1.handleFire(mRenderer, space, fireTime);
             enet_host_service(client, &evt, 0);
 
             if (evt.type == ENET_EVENT_TYPE_RECEIVE && evt.packet->data != NULL)
@@ -315,8 +319,8 @@ class Application {
                 enet_packet_destroy (evt.packet);
             }
             //Move the aircraft
-            p1.fly();
-            p2.fly();
+            p1.updateState();
+            p2.updateState();
 
 //            //Clear screen
 //            SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
@@ -354,6 +358,8 @@ class Application {
             SDLU_GL_RenderRestoreState(mRenderer);
 
             Sleep(5);
+            enet_uint32 frameOffset = enet_time_get()-lastFrameTime;
+            printf("fps: %u\n", enet_time_get());
         }
         ChipmunkDebugDrawCleanup();
         Entity::freeAll(players, space);

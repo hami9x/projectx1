@@ -49,6 +49,7 @@
 			<Add option="-lchipmunk -lSDLU -lenet -lprotobuf" />
 		</Linker>
 		<Unit filename="../bullet.cpp" />
+		<Unit filename="../bullet.png" />
 		<Unit filename="../cpDebugDraw/ChipmunkDebugDraw.cpp">
 			<Option weight="56" />
 		</Unit>
@@ -60,6 +61,7 @@
 		<Unit filename="../entity.h" />
 		<Unit filename="../global.h" />
 		<Unit filename="../map.tmx" />
+		<Unit filename="../ops.cpp" />
 		<Unit filename="../player.cpp" />
 		<Unit filename="../proto/clientinfo.pb.cc" />
 		<Unit filename="../proto/clientinfo.pb.h" />

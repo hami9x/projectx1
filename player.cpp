@@ -14,6 +14,7 @@ namespace xx {
         mVel = cpvzero;
         Rpressed=false;
         Lpressed=false;
+        firedNumber=0;
         maxAmmo=5;
         cpBodySetUserData(mEntity->body(), this);
     }
@@ -85,21 +86,19 @@ namespace xx {
 
     void Player::handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time) {
         //If holding the left button
-        if (Lpressed) {
             cpBody *body = mEntity->body();
             for( int i=0; i<=maxAmmo; i++) {
                 if ( !ammo[i].checkExist() && time>2 ) {
                     time = 0;
+                    firedNumber++;
                     ammo[i].createBullet(r, space, 500, this);
                 }
             }
-        }
     }
 
     void Player::rotLeft() {
         cpFloat angle = cpBodyGetAngle(mEntity->body());
         angle = angleAdd(angle, -PLAYER_RAD);
-        mAngle = angle;
         cpBodySetAngle(mEntity->body(), angle);
         //printf("%f %f\n", mAngle, mEntity->body()->a);
     }
@@ -107,12 +106,11 @@ namespace xx {
     void Player::rotRight() {
         cpFloat angle = cpBodyGetAngle(mEntity->body());
         angle = angleAdd(angle, PLAYER_RAD);
-        mAngle = angle;
         cpBodySetAngle(mEntity->body(), angle);
          //printf("%f %f\n", mAngle, mEntity->body()->a);
     }
 
-    void Player::fly() {
+    void Player::updateState() {
         //Apply impulse
         cpBodyApplyImpulseAtWorldPoint(mEntity->body(), mVel, cpv(0, 0));
         cpBody * body = mEntity->body();
@@ -139,5 +137,11 @@ namespace xx {
 
     void Player::setInCloud(int num) {
         mInCloud += num;
+    }
+
+    int Player::firedAmmo() {
+        int t=firedNumber;
+        firedNumber=0;
+        return t;
     }
 }

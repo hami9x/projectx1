@@ -1,6 +1,7 @@
 message PlayerMove {
   required float mvectx = 2;
   required float mvecty = 3;
+  optional int32 firenumber = 4;
 }
 
 message PlayerChange {
@@ -16,6 +17,7 @@ message PlayerUpdate {
   required float posy = 4;
   required float velx = 5;
   required float vely = 6;
+  optional int32 firenumber = 7;
 }
 
 message Update {

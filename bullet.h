@@ -8,7 +8,7 @@
 
 
 static const std::string BULLET_IMG = "bullet.png";
-static const int BULLET_SPEED = 3;
+static const int BULLET_SPEED = 6;
 
 
 namespace xx {
@@ -45,7 +45,8 @@ class Bullet {
         //Bullet properties
         double mRange;//maximum range
         double fRange;//flying range
-        bool exist;
+        double gravity=0.05;
+        bool exist,check;
         cpBody *mBody;
         cpFloat mPosX, mPosY,mX;
         cpFloat mAngle;

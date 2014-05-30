@@ -43,9 +43,11 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
 
     Player *player = (Player*)p;
     //printf("in bullet %d\n", player);
-    mVelX = player->velX();
-    mVelY = player->velY();
+    mVelX = player->velX()*BULLET_SPEED;
+    mVelY = player->velY()*BULLET_SPEED;
+    printf("::::Bullet | vel(%f,%f)\n",mVelX,mVelY);
     mAngle = player->angle();
+    printf("Angle: %f\n",mAngle);
     mPosX = player->posX();
     mPosY = player->posY();
     mX = player->sensor();
@@ -56,7 +58,6 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
     mBody = cpBodyNew(10.f, cpMomentForBox(10.f, img.width(), img.height()));
     mBody->p.x = mPosX;
     mBody->p.y = mPosY;
-
 
     //printf("%d \n",mBody->userData);
 
@@ -71,6 +72,7 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
 
     cpBodySetAngle(mBody,mAngle);
     cpBodySetUserData(mBody, this);
+    check=false;
 }
 
 void Bullet::render(SDL_Renderer * r) {
@@ -88,7 +90,14 @@ void Bullet::render(SDL_Renderer * r) {
 void Bullet::moveBullet() {
     mBody->p.x += mVelX;
     mBody->p.y += mVelY;
-    cpBodyApplyForceAtLocalPoint(mBody, cpv(mVelX, mVelY), cpv(0, 0));
+    mVelY += gravity;
+    if( ((mAngle<1.6) || (mAngle>4.7) ) && mVelY>0 && !check)
+    {
+        mAngle=M_PI - mAngle;
+        cpBodySetAngle(mBody,mAngle);
+        check=true;
+    }
+    //printf("rad %f vel(%f,%f) \n",mAngle,mVelX,mVelY);
 }
 
 }

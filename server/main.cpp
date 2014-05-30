@@ -218,11 +218,18 @@ int main(int argc, char* args[])
                 if (lastUpdated[playerId] < pc.time() || pc.time() == 0) {
                     lastUpdated[playerId] = pc.time();
                     PlayerMove m = pc.move();
-                    printf("::::: %d | %f %f\n", playerId, m.mvectx(), m.mvecty());
+//                    printf("::::: %d | %f %f\n", playerId, m.mvectx(), m.mvecty());
                     p->setMove(cpv(m.mvectx(), m.mvecty()));
                     //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
-                    p->fly();
+                    int n=m.firenumber();
+                    for(int i=1;i<=n;i++)
+                    {
+                        cpFloat t=3;
+                        p->handleFire(renderer,space,t);
+                    }
+                    p->updateState();
                     cpBodySetAngle(p->body(), pc.angle());
+                    printf("%u|||||%f\n", playerId, p->angle());
 //                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), 0, playerId,
 //                        cpBodyGetPosition(p->body()).x,
 //                        cpBodyGetPosition(p->body()).y,
