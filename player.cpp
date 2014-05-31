@@ -56,7 +56,7 @@ namespace xx {
         }
     }
 
-    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect) {
+    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect , xx::Skill *skillControl ) {
         //Rotation
         if( e.type == SDL_MOUSEMOTION) {
             int x,y;
@@ -81,7 +81,14 @@ namespace xx {
         } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT ) {
             Lpressed = false;
         }
-    }
+        // If q was pressed
+        if ( (e.type == SDL_KEYDOWN) && (e.key.keysym.sym == SDLK_q))
+                if (skillControl->coolDownCheck(1) == 1 ) {
+                    skillControl->lastUsedPush = enet_time_get();
+                    cpBodyApplyImpulseAtWorldPoint(mEntity->body(),cpv(10000,10000), cpv(0, 0));
+                    }
+        }
+
 
     void Player::handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time) {
         //If holding the left button

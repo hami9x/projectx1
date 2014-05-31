@@ -20,6 +20,7 @@
 #include "player.h"
 #include "bullet.h"
 #include "ops.h"
+#include "skill.h"
 #include "proto/player.pb.h"
 #include "proto/clientinfo.pb.h"
 
@@ -81,6 +82,23 @@ void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFon
     Text hptxt(num,mFont, {94,19,83});
     hptxt.render(mRenderer,x+10,y+35,200);
 }
+void loadIcon(std::string path,int x , int y, SDL_Renderer *renderer){
+    Texture icon;
+    icon.loadFromFile(renderer,path.c_str());
+    icon.render(renderer,x,y);
+}
+void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skill* skillControl , int skillNum){
+    enet_uint32 timecounter,present = enet_time_get();
+
+    if (skillControl->coolDownCheck(skillNum) < 1) {
+        Texture cooldownBox;
+        cooldownBox.loadFromFile(renderer,"cooldown.png");
+        cooldownBox.setBlendMode(SDL_BLENDMODE_BLEND);
+        cooldownBox.setAlpha(100);
+        SDL_Rect cdBox = {0,0,30-30*skillControl->coolDownCheck(skillNum),30};
+        cooldownBox.render(renderer,x,y,&cdBox);
+    }
+}
 
 class Application {
     //The window we'll be rendering to
@@ -102,6 +120,7 @@ class Application {
     }
 
     int start() {
+        Skill skillControl;
         if (enet_initialize () != 0)
         {
             fprintf (stderr, "An error occurred while initializing ENet.\n");
@@ -121,7 +140,6 @@ class Application {
                      "An error occurred while trying to create an ENet client host.\n");
             exit(EXIT_FAILURE);
         }
-
         ENetAddress address;
         ENetEvent event;
         ENetPeer *host;
@@ -236,7 +254,7 @@ class Application {
                 }
                 else
                 {
-                    p1.handleEvent(e, mRenderer, space, mvVect);
+                    p1.handleEvent(e, mRenderer, space, mvVect , &skillControl);
                 }
             }
             p1.rightPressCheck(mvVect);
@@ -298,7 +316,7 @@ class Application {
                     cpVect svpos = cpv(pu.posx(), pu.posy());
                     cpFloat timeoffs = cpFloat(enet_time_get()-u.time())/1000.;
                     cpFloat dist = cpvdist(svpos, pos);
-                    if (dist >= 100) {
+                   /* if (dist >= 100) {
                         cpBodySetPosition(p->body(), svpos);
                         cpSpaceStep(space, timeoffs);
                     } else if (dist >= 5) {
@@ -307,7 +325,7 @@ class Application {
                         cpBodySetVelocity(p->body(), cpvmult(offs, 1./cpvlength(offs)));
                         cpSpaceStep(space, timeoffs/3.);
                         cpBodySetVelocity(p->body(), vel);
-                    }
+                    }*/
                     if (pu.player() == playerId ) {
                         cpBodySetAngle(p->body(), angle);
                     }
@@ -335,6 +353,9 @@ class Application {
 
 
             cpSpaceStep(space, timeStep);
+            printf("%f\n",skillControl.coolDownCheck(1));
+            loadIcon("push.jpg", 5 , 45 , mRenderer);
+            drawCoolDown(5 ,45 ,mRenderer , &skillControl ,1 );
             drawPlayerHp(p1, mRenderer,0,0,assets.defFont());
             drawPlayerHp(p1, mRenderer,666,0,assets.defFont());
 
