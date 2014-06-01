@@ -15,9 +15,25 @@ class Skill
 
         void setTime(enet_uint32 time) { timer = time; }
 
+        enet_uint32 cd;
+
+        enet_uint32 timer;
     protected:
     private:
-        enet_uint32 timer;
+};
+class Skillmanager
+{
+    public:
+        Skillmanager();
+
+        ~Skillmanager();
+
+        float cdCheck(int i) { return skill[i].coolDownCheck(); }
+
+        void resetCd(int i) { skill[i].timer = enet_time_get(); }
+    protected:
+    private:
+        Skill skill[4];
 
 };
 }

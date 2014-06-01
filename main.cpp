@@ -20,7 +20,7 @@
 #include "player.h"
 #include "bullet.h"
 #include "ops.h"
-#include "skillmanager.h"
+#include "skill.h"
 #include "proto/player.pb.h"
 #include "proto/clientinfo.pb.h"
 

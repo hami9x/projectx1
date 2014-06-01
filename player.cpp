@@ -16,7 +16,7 @@ namespace xx {
         Lpressed=false;
         maxAmmo=5;
         cpBodySetUserData(mEntity->body(), this);
-        vtpush = cpvzero;
+        mVectp = cpvzero;
     }
 
     Player::~Player() {
@@ -85,9 +85,9 @@ namespace xx {
         // If q was pressed
         if ( (e.type == SDL_KEYDOWN) && (e.key.keysym.sym == SDLK_q)) {
                 if (sManager->cdCheck(1) == 1 ) {
-                    sManager->setTime(enet_time_get(),1);
-                    vtpush = cpvmult(vectorForward(),50);
-                    moveVect = cpvadd(moveVect,vtpush);
+                    sManager->resetCd(1);
+                    mVectp = cpvmult(vectorForward(),50);
+                    moveVect = cpvadd(moveVect,mVectp);
                 }
         }
         }
@@ -124,8 +124,8 @@ namespace xx {
 
     void Player::fly() {
         //Apply impulse
-        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpvadd(mVel,vtpush), cpv(0, 0));
-        vtpush = cpvzero;
+        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpvadd(mVel,mVectp), cpv(0, 0));
+        mVectp = cpvzero;
         cpBody * body = mEntity->body();
         for(int i=0; i<=maxAmmo; i++)
             if( ammo[i].checkExist() )

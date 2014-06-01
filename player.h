@@ -5,7 +5,7 @@
 #include "entity.h"
 #include "texture.h"
 #include "bullet.h"
-#include "skillmanager.h"
+#include "skill.h"
 #include "proto/player.pb.h"
 
 const cpFloat PLAYER_RAD = 0.05f;
@@ -95,7 +95,7 @@ class Player {
         int maxAmmo;
         Bullet ammo[10];
 
-        cpVect vtpush;
+        cpVect mVectp;
 };
 
 }

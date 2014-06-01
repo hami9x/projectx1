@@ -9,14 +9,18 @@ Skill::Skill(){
 }
 float Skill::coolDownCheck(){
     enet_uint32 now = enet_time_get();
-    if (((float)(now-timer)/5000 > 1.00) || timer == 0 ) {
+    if (((float)(now-timer)/cd > 1.00) || timer == 0 ) {
         return 1.00;
     } else {
-        return (float)(now-timer)/5000;
+        return (float)(now-timer)/cd;
     }
 }
 Skill::~Skill()
 {
-    //dtor
+}
+Skillmanager::Skillmanager(){
+    skill[1].cd = 5000;
+}
+Skillmanager::~Skillmanager(){
 }
 }

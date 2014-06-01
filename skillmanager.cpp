@@ -4,9 +4,6 @@
 #include <enet/enet.h>
 
 namespace xx {
-Skillmanager::Skillmanager(){
-}
-Skillmanager::~Skillmanager(){
-}
+
 }
 
