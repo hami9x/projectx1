@@ -5,6 +5,10 @@
 namespace xx {
 class Skill
 {
+        enet_uint32 mCd;
+
+        enet_uint32 mTimer;
+
     public:
         Skill();
 
@@ -13,27 +17,22 @@ class Skill
         //Checking cooldown
         float coolDownCheck();
 
-        void setTime(enet_uint32 time) { timer = time; }
+        void setTime(enet_uint32 time) { mTimer = time; }
 
-        enet_uint32 cd;
-
-        enet_uint32 timer;
-    protected:
-    private:
+        void setCd(enet_uint32 cooldown) { mCd = cooldown; }
 };
 class Skillmanager
 {
+         Skill mSkill[4];
+
     public:
         Skillmanager();
 
         ~Skillmanager();
 
-        float cdCheck(int i) { return skill[i].coolDownCheck(); }
+        float cdCheck(int i) { return mSkill[i].coolDownCheck(); }
 
-        void resetCd(int i) { skill[i].timer = enet_time_get(); }
-    protected:
-    private:
-        Skill skill[4];
+        void resetCd(int i) { mSkill[i].setTime(enet_time_get()); }
 
 };
 }
