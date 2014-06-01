@@ -44,8 +44,6 @@
 			<Add directory="../x1-deps" />
 		</Linker>
 		<Unit filename="NovaSquare.ttf" />
-		<Unit filename="Skill.cpp" />
-		<Unit filename="Skill.h" />
 		<Unit filename="aircraft.gif" />
 		<Unit filename="aircraft.png" />
 		<Unit filename="bullet.cpp" />
@@ -59,12 +57,16 @@
 			<Option weight="100" />
 		</Unit>
 		<Unit filename="map.tmx" />
+		<Unit filename="ops.cpp" />
+		<Unit filename="ops.h" />
 		<Unit filename="player.cpp" />
 		<Unit filename="player.h" />
 		<Unit filename="proto/clientinfo.pb.cc" />
 		<Unit filename="proto/clientinfo.pb.h" />
 		<Unit filename="proto/player.pb.cc" />
 		<Unit filename="proto/player.pb.h" />
+		<Unit filename="skill.cpp" />
+		<Unit filename="skill.h" />
 		<Unit filename="text.cpp">
 			<Option weight="74" />
 		</Unit>

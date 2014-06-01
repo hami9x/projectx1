@@ -20,7 +20,7 @@
 #include "player.h"
 #include "bullet.h"
 #include "ops.h"
-#include "skill.h"
+#include "skillmanager.h"
 #include "proto/player.pb.h"
 #include "proto/clientinfo.pb.h"
 
@@ -87,15 +87,13 @@ void loadIcon(std::string path,int x , int y, SDL_Renderer *renderer){
     icon.loadFromFile(renderer,path.c_str());
     icon.render(renderer,x,y);
 }
-void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skill* skillControl , int skillNum){
-    enet_uint32 timecounter,present = enet_time_get();
-
-    if (skillControl->coolDownCheck(skillNum) < 1) {
+void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skillmanager* sManager , int skillNum){
+    if (sManager->cdCheck(skillNum) < 1) {
         Texture cooldownBox;
         cooldownBox.loadFromFile(renderer,"cooldown.png");
         cooldownBox.setBlendMode(SDL_BLENDMODE_BLEND);
         cooldownBox.setAlpha(100);
-        SDL_Rect cdBox = {0,0,30-30*skillControl->coolDownCheck(skillNum),30};
+        SDL_Rect cdBox = {0,0,30-30*sManager->cdCheck(skillNum),30};
         cooldownBox.render(renderer,x,y,&cdBox);
     }
 }
@@ -120,7 +118,6 @@ class Application {
     }
 
     int start() {
-        Skill skillControl;
         if (enet_initialize () != 0)
         {
             fprintf (stderr, "An error occurred while initializing ENet.\n");
@@ -198,7 +195,7 @@ class Application {
         if (error != TmxReturn::kSuccess) {
             printf("Tmx parse error. Code %d.\n", error);
         }
-
+        Skillmanager sManager;
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
         EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, space);
@@ -212,8 +209,7 @@ class Application {
         Player p1(players[playerId-1]);
         //Assume we have 2 player only, this could be change later.
         Player p2(players[2-playerId]);
-        //
-        explosionPrepare(mRenderer);
+        //explosionPrepare(mRenderer);
         //Debug Draw
         ChipmunkDebugDrawInit();
         SDL_RenderPresent(mRenderer);
@@ -254,7 +250,8 @@ class Application {
                 }
                 else
                 {
-                    p1.handleEvent(e, mRenderer, space, mvVect , &skillControl);
+                    p1.handleEvent(e, mRenderer, space, mvVect , &sManager);
+
                 }
             }
             p1.rightPressCheck(mvVect);
@@ -316,7 +313,7 @@ class Application {
                     cpVect svpos = cpv(pu.posx(), pu.posy());
                     cpFloat timeoffs = cpFloat(enet_time_get()-u.time())/1000.;
                     cpFloat dist = cpvdist(svpos, pos);
-                   /* if (dist >= 100) {
+                    if (dist >= 100) {
                         cpBodySetPosition(p->body(), svpos);
                         cpSpaceStep(space, timeoffs);
                     } else if (dist >= 5) {
@@ -325,7 +322,7 @@ class Application {
                         cpBodySetVelocity(p->body(), cpvmult(offs, 1./cpvlength(offs)));
                         cpSpaceStep(space, timeoffs/3.);
                         cpBodySetVelocity(p->body(), vel);
-                    }*/
+                    }
                     if (pu.player() == playerId ) {
                         cpBodySetAngle(p->body(), angle);
                     }
@@ -353,9 +350,8 @@ class Application {
 
 
             cpSpaceStep(space, timeStep);
-            printf("%f\n",skillControl.coolDownCheck(1));
-            loadIcon("push.jpg", 5 , 45 , mRenderer);
-            drawCoolDown(5 ,45 ,mRenderer , &skillControl ,1 );
+            loadIcon("push.jpg", 5 , 65 , mRenderer);
+            drawCoolDown(5 ,65 ,mRenderer , &sManager ,1 );
             drawPlayerHp(p1, mRenderer,0,0,assets.defFont());
             drawPlayerHp(p1, mRenderer,666,0,assets.defFont());
 

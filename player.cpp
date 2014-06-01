@@ -16,6 +16,7 @@ namespace xx {
         Lpressed=false;
         maxAmmo=5;
         cpBodySetUserData(mEntity->body(), this);
+        vtpush = cpvzero;
     }
 
     Player::~Player() {
@@ -56,7 +57,7 @@ namespace xx {
         }
     }
 
-    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect , xx::Skill *skillControl ) {
+    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect , Skillmanager *sManager ) {
         //Rotation
         if( e.type == SDL_MOUSEMOTION) {
             int x,y;
@@ -82,11 +83,13 @@ namespace xx {
             Lpressed = false;
         }
         // If q was pressed
-        if ( (e.type == SDL_KEYDOWN) && (e.key.keysym.sym == SDLK_q))
-                if (skillControl->coolDownCheck(1) == 1 ) {
-                    skillControl->lastUsedPush = enet_time_get();
-                    cpBodyApplyImpulseAtWorldPoint(mEntity->body(),cpv(10000,10000), cpv(0, 0));
-                    }
+        if ( (e.type == SDL_KEYDOWN) && (e.key.keysym.sym == SDLK_q)) {
+                if (sManager->cdCheck(1) == 1 ) {
+                    sManager->setTime(enet_time_get(),1);
+                    vtpush = cpvmult(vectorForward(),50);
+                    moveVect = cpvadd(moveVect,vtpush);
+                }
+        }
         }
 
 
@@ -121,7 +124,8 @@ namespace xx {
 
     void Player::fly() {
         //Apply impulse
-        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), mVel, cpv(0, 0));
+        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpvadd(mVel,vtpush), cpv(0, 0));
+        vtpush = cpvzero;
         cpBody * body = mEntity->body();
         for(int i=0; i<=maxAmmo; i++)
             if( ammo[i].checkExist() )

@@ -11,12 +11,13 @@ class Skill
         ~Skill();
 
         //Checking cooldown
-        float coolDownCheck(int skillNum);
+        float coolDownCheck();
 
-        enet_uint32 lastUsedPush;
+        void setTime(enet_uint32 time) { timer = time; }
 
     protected:
     private:
+        enet_uint32 timer;
 
 };
 }
