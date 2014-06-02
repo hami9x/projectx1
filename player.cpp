@@ -112,7 +112,7 @@ namespace xx {
          //printf("%f %f\n", mAngle, mEntity->body()->a);
     }
 
-    void Player::fly() {
+    void Player::updateState() {
         //Apply impulse
         cpBodyApplyImpulseAtWorldPoint(mEntity->body(), mVel, cpv(0, 0));
         cpBody * body = mEntity->body();

@@ -12,6 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-std=c++11" />
 					<Add option="-g" />
 					<Add option="-DGLEW_STATIC" />
 				</Compiler>
@@ -47,8 +48,12 @@
 		<Unit filename="bullet.cpp" />
 		<Unit filename="bullet.h" />
 		<Unit filename="cb.bmp" />
+		<Unit filename="client.cpp" />
+		<Unit filename="client.h" />
 		<Unit filename="entity.cpp" />
 		<Unit filename="entity.h" />
+		<Unit filename="explosion.cpp" />
+		<Unit filename="explosion.h" />
 		<Unit filename="explosion.png" />
 		<Unit filename="global.h" />
 		<Unit filename="main.cpp">
@@ -59,12 +64,16 @@
 		<Unit filename="ops.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="physics.cpp" />
+		<Unit filename="physics.h" />
 		<Unit filename="player.cpp" />
 		<Unit filename="player.h" />
 		<Unit filename="proto/clientinfo.pb.cc" />
 		<Unit filename="proto/clientinfo.pb.h" />
 		<Unit filename="proto/player.pb.cc" />
 		<Unit filename="proto/player.pb.h" />
+		<Unit filename="syncer.cpp" />
+		<Unit filename="syncer.h" />
 		<Unit filename="text.cpp">
 			<Option weight="74" />
 		</Unit>
@@ -73,6 +82,8 @@
 			<Option weight="59" />
 		</Unit>
 		<Unit filename="texture.h" />
+		<Unit filename="utils.cpp" />
+		<Unit filename="utils.h" />
 		<Unit filename="vendor/cpDebugDraw/ChipmunkDebugDraw.cpp" />
 		<Unit filename="vendor/cpDebugDraw/ChipmunkDebugDraw.h" />
 		<Unit filename="vendor/cpDebugDraw/DebugDrawImpl.cpp" />

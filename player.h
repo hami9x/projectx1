@@ -41,7 +41,7 @@ class Player {
         void setInCloud(int);
 
         //Move the aircraft
-        void fly();
+        void updateState();
 
 
         //HP
