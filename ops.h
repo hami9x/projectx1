@@ -1,19 +1,15 @@
 //#ifndef OPS_H_INCLUDED
 //#define OPS_H_INCLUDED
+//#include "utils.h"
 //
-//#include "chipmunk_private.h"
-//#include "player.h"
-//#include <enet/enet.h>
-//#include "proto/player.pb.h"
-//
-//namespace xx {
-//
-////static cpBool beginFunc(cpArbiter *arb, cpSpace *space, void* unused);
+////class FpsInfo {
+////    utils::Timer mTimer;
+////    Font *mFont;
 ////
-////static void separateFunc (cpArbiter *arb, cpSpace *space, void *unused);
+////    FpsInfo(int interval);
+////    ~FpsInfo();
 ////
-////void collision(int type_a, int type_b, cpSpace *space, Player *pl);
-//
-//}
+////    render(uint32 frameTime);
+////};
 //
 //#endif // OPS_H_INCLUDED

@@ -34,7 +34,7 @@
 			<Add option="-DPROTOBUF_USE_DLLS" />
 			<Add directory="vendor/tinyxml" />
 			<Add directory="vendor/tmxparser/src" />
-			<Add directory="cpDebugDraw" />
+			<Add directory="vendor/cpDebugDraw" />
 			<Add directory="../x1-deps/include" />
 		</Compiler>
 		<Linker>

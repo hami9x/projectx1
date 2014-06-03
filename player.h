@@ -32,7 +32,7 @@ class Player {
         void render(SDL_Renderer *r);
 
         //Event Handler
-        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect);
+        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space);
 
         void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time);
 
@@ -42,6 +42,7 @@ class Player {
 
         //Move the aircraft
         void updateState();
+        void renderBullets(SDL_Renderer *r);
 
 
         //HP

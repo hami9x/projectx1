@@ -19,14 +19,18 @@ Client::Client() {
     mPlayerId = -1;
     mBuffer = 0;
     mBuffSize = 0;
+    mOfflineMode = false;
+    mEvent.packet = NULL;
 }
 
 Client::~Client() {
-    enet_peer_reset(mHost);
-    enet_host_destroy(mClient);
+    if (mClient) enet_host_destroy(mClient);
 }
 
 void Client::connect(const char * dest, int timeout) {
+    if (mOfflineMode) {
+        return;
+    }
     ENetAddress address;
     ENetEvent event;
     enet_address_set_host(&address, dest);
@@ -43,7 +47,6 @@ void Client::connect(const char * dest, int timeout) {
         event.type == ENET_EVENT_TYPE_CONNECT)
     {
         printf ("Connection to %s:5555 succeeded.\n", dest);
-        exit(EXIT_FAILURE);
     }
     else
     {
@@ -79,6 +82,9 @@ int Client::requestPlayerId() {
 }
 
 int Client::playerId() {
+    if (mOfflineMode) {
+        return 1;
+    }
     if (mPlayerId == -1) {
         printf("Not connected.");
         exit(EXIT_FAILURE);
@@ -86,36 +92,47 @@ int Client::playerId() {
     return mPlayerId;
 }
 
-void Client::clean() {
-    if (mBuffer != NULL) free(mBuffer);
-    if (mEvent.packet != NULL) enet_packet_destroy(mEvent.packet);
+void Client::clean(ENetPacket *packet) {
+    if (packet->data != NULL) enet_packet_destroy(packet);
     mBuffSize = 0;
 }
 
 ENetPacket* Client::recv(int timeout) {
-    enet_host_service(mClient, &mEvent, timeout);
-    if (mEvent.type == ENET_EVENT_TYPE_RECEIVE && mEvent.packet->data != NULL) {
-        return mEvent.packet;
+    ENetEvent event;
+    if (mOfflineMode) {
+        return NULL;
+    }
+    enet_host_service(mClient, &event, timeout);
+    if (event.type == ENET_EVENT_TYPE_RECEIVE && event.packet->data != NULL) {
+        return event.packet;
     }
 
     return NULL;
 }
 
 void Client::send(int channel) {
+    if (mOfflineMode) {
+        return;
+    }
+
     if (!mBuffer || mBuffSize == 0) {
         printf("Buffer empty, please put data into the buffer first.\n");
         exit(EXIT_FAILURE);
     }
     ENetPacket * packet = enet_packet_create(mBuffer, mBuffSize, 0);
     enet_peer_send(mHost, channel, packet);
-    enet_host_service(mClient, NULL, 0);
-    clean();
+    enet_host_flush(mClient);
+    free(mBuffer);
 }
 
 void* Client::buffer(int size) {
     mBuffer = malloc(size);
     mBuffSize = size;
     return mBuffer;
+}
+
+void Client::setOfflineMode() {
+    mOfflineMode = true;
 }
 
 //ns end

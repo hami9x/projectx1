@@ -14,12 +14,13 @@ static cpBool planeCloudBeginFunc(cpArbiter *arb, cpSpace *space, void*) {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
     planeCloud(a, 1);
+    return false;
 }
 
 static void planeCloudSepFunc(cpArbiter *arb, cpSpace *space, void*) {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
-    planeCloud(a, -3);
+    planeCloud(a, -1);
 }
 
 static cpBool bulletCloudBeginFunc(cpArbiter *arb, cpSpace *space, void*) {

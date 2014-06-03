@@ -21,17 +21,6 @@ namespace xx {
     Player::~Player() {
     }
 
-    void Player::render(SDL_Renderer *r) {
-        if (mInCloud) {
-            hurt(mInCloud);
-        }
-        for(int i=0; i<=maxAmmo; i++)
-        {
-            if( ammo[i].checkExist() )
-                ammo[i].render(r);
-        }
-    }
-
     cpFloat angleAdd(cpFloat angle, cpFloat delta) {
         angle += delta;
         if (angle >= 2*M_PI) {
@@ -56,7 +45,7 @@ namespace xx {
         }
     }
 
-    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, cpVect & moveVect) {
+    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
         //Rotation
         if( e.type == SDL_MOUSEMOTION) {
             int x,y;
@@ -112,7 +101,20 @@ namespace xx {
          //printf("%f %f\n", mAngle, mEntity->body()->a);
     }
 
+    void Player::renderBullets(SDL_Renderer * r) {
+        for(int i=0; i<=maxAmmo; i++)
+        {
+            if( ammo[i].checkExist() )
+                ammo[i].render(r);
+        }
+    }
+
     void Player::updateState() {
+        //states
+        if (mInCloud > 0) {
+            hurt(mInCloud);
+        }
+
         //Apply impulse
         cpBodyApplyImpulseAtWorldPoint(mEntity->body(), mVel, cpv(0, 0));
         cpBody * body = mEntity->body();
@@ -132,8 +134,9 @@ namespace xx {
     }
 
     void Player::hurt(int dam){
-        if (dam<hp) hp-=dam; else {
-            hp=0;
+        hp -= dam;
+        if (hp < 0) {
+            hp = 0;
         }
     }
 

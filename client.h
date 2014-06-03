@@ -13,6 +13,7 @@ private:
     void * mBuffer;
     int requestPlayerId();
     int mBuffSize;
+    bool mOfflineMode;
 
 public:
     Client();
@@ -20,10 +21,11 @@ public:
 
     void connect(const char* dest, int timeout);
     ENetPacket* recv(int timeout);
-    void clean();
+    void clean(ENetPacket *packet);
     void send(int channel);
     void* buffer(int size);
     int playerId();
+    void setOfflineMode();
 };
 
 //ns end

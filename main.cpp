@@ -122,7 +122,9 @@ class Application {
     int start() {
         //! Network setup
         enet_init();
-        Client client; client.connect("localhost", 1);
+        Client client;
+        //client.setOfflineMode();
+        client.connect("localhost", 1000);
         int playerId = client.playerId();
 
         //! Physics setup
@@ -154,7 +156,12 @@ class Application {
 
         //! Client-server syncer
         Syncer syncer(&client, &p1, &p2);
-        syncer.start(mvVect);
+        //syncer.start(&mvVect);
+        bool stopped = false;
+        Update update;
+        bool updated = false;
+        std::thread ut1(&Syncer::playerHostSync, syncer, &stopped, std::ref(update), std::ref(updated));
+        std::thread ut2(&Syncer::playerSendUpdate, syncer, &stopped, &mvVect);
 
         //!
         //
@@ -169,8 +176,9 @@ class Application {
         //!! Khong phan su mien vao :-s
         bool quit = false;
         SDL_Event e;
-        utils::Timer fTimer(0);
+        utils::Timer fTimer(0), fpsTimer(300);
         uint32 ftime = 0;
+        int fps;
 
         //While application is running
         while( !quit )
@@ -190,19 +198,20 @@ class Application {
                 }
                 else
                 {
-                    p1.handleEvent(e, mRenderer, physics.space(), mvVect);
+                    p1.handleEvent(e, mRenderer, physics.space());
                 }
             }
             p1.rightPressCheck(mvVect);
+            printf("%f %f: \n", mvVect.x, mvVect.y);
 
             //Firing
             //p1.handleFire(mRenderer, space, fireTime);
 
             //Move the aircraft
             p1.updateState();
-            p2.updateState();
+            p1.renderBullets(mRenderer);
 
-            syncer.updateBodies(&physics);
+            syncer.updateBodies(&physics, update, updated);
 
             //!!! Rendering Area
             //!!  Khong phan su mien vao :v
@@ -212,17 +221,16 @@ class Application {
 
             Entity::renderAll(players, mRenderer);
 
-            p1.render(mRenderer);
-
             //TODO: split explosion into class, this explosionCheck from nowhere is...
             //explosionCheckRender(mRenderer);
-//          Entity::renderAll(clouds, mRenderer);
-
             Entity::renderAll(clouds, mRenderer);
 
             drawPlayerHp(p1, mRenderer,0,0,assets.defFont());
             drawPlayerHp(p1, mRenderer,666,0,assets.defFont());
-            drawFPSInfo(mRenderer, 1000/ftime, 20, 20, assets.defFont());
+            if (ftime && fpsTimer.exceededReset()) {
+                fps = 1000/ftime;
+            }
+            drawFPSInfo(mRenderer, fps, 20, 20, assets.defFont());
 
             //Demo draw from SDL2_gfx
             //filledPieRGBA(mRenderer, 200, 200, 200, 0, 70, 100, 200, 100, 255);
@@ -230,22 +238,25 @@ class Application {
             SDL_RenderPresent(mRenderer);
 
             SDLU_GL_RenderCacheState(mRenderer);
-            glShadeModel(GL_SMOOTH);
             glClear(GL_COLOR_BUFFER_BIT);
             ChipmunkDebugDrawPushRenderer();
             PerformDebugDraw(physics.space());
             ChipmunkDebugDrawFlushRenderer();
             ChipmunkDebugDrawPopRenderer();
-            glShadeModel(GL_FLAT);      /* restore state */
             SDLU_GL_RenderRestoreState(mRenderer);
             //!!! End Rendering Area
         }
+
+        stopped = true;
+        ut1.detach();
+        ut2.detach();
 
         ChipmunkDebugDrawCleanup();
         Entity::freeAll(players, physics.space());
         Entity::freeAll(clouds, physics.space());
 
         physics.free();
+
     }
 
     bool loadExtensions()

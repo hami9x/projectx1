@@ -1,5 +1,6 @@
 #ifndef SYNCER_H_INCLUDED
 #define SYNCER_H_INCLUDED
+#include <thread>
 #include "client.h"
 #include "utils.h"
 #include "player.h"
@@ -13,16 +14,13 @@ namespace xx {
         Player *mOtherPlayer;
 
         uint32 mLastRecvUpdate;
-        Update mUpdate;
-        bool mUpdated;
-        bool mStopped;
-        void playerHostSync();
-        void playerSendUpdate(cpVect & mvVect);
     public:
         Syncer(Client *, Player *, Player *);
-        void start(cpVect & mvVect);
+        ~Syncer();
         void stop();
-        void updateBodies(Physics * physics);
+        void updateBodies(Physics * physics, Update & update, bool updated);
+        void playerHostSync(bool *stopped, Update & update, bool & updated);
+        void playerSendUpdate(bool *stopped, cpVect * mvVect);
     };
 }
 

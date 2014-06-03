@@ -1,4 +1,5 @@
 #include <thread>
+#include <chrono>
 #include "chipmunk_private.h"
 #include "syncer.h"
 #include "utils.h"
@@ -10,39 +11,44 @@ Syncer::Syncer(Client *client, Player *player, Player *otherPlayer) {
     mPlayer = player;
     mOtherPlayer = otherPlayer;
     mLastRecvUpdate = 0;
-    mUpdated = false;
 }
 
-void Syncer::start(cpVect & mvVect) {
-    std::thread ut1(&Syncer::playerHostSync, *this);
-    std::thread ut2(&Syncer::playerSendUpdate, *this, std::ref(mvVect));
+Syncer::~Syncer() {
 }
 
-void Syncer::playerHostSync() {
+void Syncer::playerHostSync(bool *stopped, Update & update, bool & updated) {
     ENetPacket * packet;
-    while(true) {
-        packet = mClient->recv(5);
+
+    while(!(*stopped)) {
+        packet = mClient->recv(5000);
         if (packet != NULL) {
-            mUpdate.ParseFromArray(packet->data, packet->dataLength);
-            mUpdated = true;
-    //                printf ("A packet of length %u was received from %d on channel %u.\n",
-    //                evt.packet->dataLength,
-    //                (int)evt.peer->data,
-    //                evt.channelID);
-            mClient->clean();
-            Sleep(20);
+            update.ParseFromArray(packet->data, packet->dataLength);
+            updated = true;
+//                    printf ("A packet of length %u was received from %d on channel %u.\n",
+//                    evt.packet->dataLength,
+//                    (int)evt.peer->data,
+//                    evt.channelID);
+            mClient->clean(packet);
+
+            std::chrono::milliseconds dura(20);
+            std::this_thread::sleep_for(dura);
             continue;
         }
 
-        return;
+        //return;
     }
+
+    printf("playerHostSync stopped.\n");
 }
 
-void Syncer::playerSendUpdate(cpVect & mvVect) {
-    utils::Timer timer(50);
+void Syncer::playerSendUpdate(bool *stopped, cpVect * _mvVect) {
+    utils::Timer timer(100);
     int size = 0;
-    while(true) {
+
+    while(!(*stopped)) {
         if (timer.exceededReset()) {
+            cpVect mvVect = *_mvVect;
+            //printf("%f %f: \n", mvVect.x, mvVect.y);
             if (cpvlength(mvVect) == 0) {
                 continue;
             }
@@ -61,22 +67,24 @@ void Syncer::playerSendUpdate(cpVect & mvVect) {
             if (mvVect.x != 0 || mvVect.y != 0) {
                 //printf("::%f %f\n", pc.move().mvectx(), pc.move().mvecty());
             }
-            mvVect = cpvzero;
+            *_mvVect = cpvzero;
         }
-        Sleep(20);
+        std::chrono::milliseconds dura(20);
+        std::this_thread::sleep_for(dura);
     }
 }
 
 //To be called in main for actual update of the players and objects
-void Syncer::updateBodies(Physics * physics) {
-    if (!mUpdated || mUpdate.time() <= mLastRecvUpdate) {
+void Syncer::updateBodies(Physics * physics, Update & update, bool updated) {
+    if (!updated || update.time() <= mLastRecvUpdate) {
         return;
     }
-    mUpdated = true;
-    mLastRecvUpdate = mUpdate.time();
-    google::protobuf::RepeatedPtrField<PlayerUpdate> pus = mUpdate.players();
+    updated = true;
+    mLastRecvUpdate = update.time();
+    google::protobuf::RepeatedPtrField<PlayerUpdate> pus = update.players();
     google::protobuf::RepeatedPtrField<PlayerUpdate>::iterator ii;
     for (ii = pus.begin(); ii != pus.end(); ++ii) {
+        printf("DKDFKLLLLLLLLL\n");
         PlayerUpdate pu = *ii;
         cpVect svpos = cpv(pu.posx(), pu.posy());
 
@@ -99,7 +107,7 @@ void Syncer::updateBodies(Physics * physics) {
         cpBodySetAngle(p->body(), pu.angle());
 
         cpVect pos = cpBodyGetPosition(p->body());
-        cpFloat timeoffs = utils::now()-mUpdate.time();
+        cpFloat timeoffs = utils::now()-update.time();
         cpFloat dist = cpvdist(svpos, pos);
         //printf("dist>> %f\n", dist);
 

@@ -8,7 +8,7 @@
 
 #include "global.h"
 #include "player.h"
-#include "ops.h"
+#include "physics.h"
 #include "proto/player.pb.h"
 #include "proto/clientinfo.pb.h"
 
@@ -67,12 +67,8 @@ int main(int argc, char* args[])
 
     initSDL();
 
-    // cpVect is a 2D vector and cpv() is a shortcut for initializing them.
-    cpVect gravity = cpv(0, 0);
-    // Create an empty space.
-    cpSpace *space = cpSpaceNew();
-    cpSpaceSetGravity(space, gravity);
-    cpSpaceSetDamping(space, 0.5);
+    Physics physics(16);
+    physics.setupCollisions();
 
     TmxMap m;
     TmxReturn error = tmxparser::parseFromFile("../map.tmx", &m);
@@ -80,13 +76,14 @@ int main(int argc, char* args[])
         printf("Tmx parse error. Code %d.\n", error);
     }
 
+    cpSpace * space = physics.space();
+
     EntityCollection playerEnts = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, NULL, space);
     EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, NULL, space);
 
     vector<Player> players(playerEnts.size());
     for (size_t i=0; i<playerEnts.size(); i++) {
         players[i] = Player(playerEnts[i]);
-        setupCollisions(space, &players[i]);
     }
 
     vector<bool> connected(playerEnts.size()+1, false);
@@ -119,8 +116,15 @@ int main(int argc, char* args[])
     //collision
     ChipmunkDebugDrawInit();
 
+    utils::Timer fTimer(0); uint32 ftime = 0;
+
     while (1)
     {
+        ftime = fTimer.elapsed();
+        //! Physics integration
+        physics.step(ftime);
+        //!
+        fTimer.reset();
         while( SDL_PollEvent( &e ) != 0 )
             {
                 //User requests quit
@@ -165,6 +169,7 @@ int main(int argc, char* args[])
         }
 
         //Entity::renderAll(playerEnts, renderer);
+
         SDL_RenderPresent(renderer);
         SDLU_GL_RenderCacheState(renderer);
         glShadeModel(GL_SMOOTH);
@@ -175,7 +180,8 @@ int main(int argc, char* args[])
         ChipmunkDebugDrawPopRenderer();
         glShadeModel(GL_FLAT);      /* restore state */
         SDLU_GL_RenderRestoreState(renderer);
-        cpSpaceStep(space, timeStep);
+
+        //if (ftime) printf("fps: %u.\n", 1000/ftime);
 
         if (enet_host_service (server, &event, 0) <= 0) {
             continue;
@@ -184,6 +190,7 @@ int main(int argc, char* args[])
         ClientInfo ci;
         PlayerUpdate pu;
         ENetPacket * packet;
+
         switch (event.type)
         {
         case ENET_EVENT_TYPE_CONNECT:
@@ -222,7 +229,7 @@ int main(int argc, char* args[])
                     //printf("::::: %d | %f %f\n", playerId, m.mvectx(), m.mvecty());
                     p->setMove(cpv(m.mvectx(), m.mvecty()));
                     //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
-                    p->fly();
+                    p->updateState();
                     cpBodySetAngle(p->body(), pc.angle());
 //                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), 0, playerId,
 //                        cpBodyGetPosition(p->body()).x,
@@ -243,8 +250,6 @@ int main(int argc, char* args[])
             /* Reset the peer's client information. */
             event.peer -> data = NULL;
         }
-
-        Sleep(5);
     }
 
     enet_host_destroy(server);
