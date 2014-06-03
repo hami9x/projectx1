@@ -34,7 +34,7 @@
 			<Add option="-DPROTOBUF_USE_DLLS" />
 			<Add directory="vendor/tinyxml" />
 			<Add directory="vendor/tmxparser/src" />
-			<Add directory="vendor/cpDebugDraw" />
+			<Add directory="cpDebugDraw" />
 			<Add directory="../x1-deps/include" />
 		</Compiler>
 		<Linker>
@@ -50,6 +50,9 @@
 		<Unit filename="cb.bmp" />
 		<Unit filename="client.cpp" />
 		<Unit filename="client.h" />
+		<Unit filename="cpDebugDraw/ChipmunkDebugDraw.cpp" />
+		<Unit filename="cpDebugDraw/ChipmunkDebugDraw.h" />
+		<Unit filename="cpDebugDraw/DebugDrawImpl.cpp" />
 		<Unit filename="entity.cpp" />
 		<Unit filename="entity.h" />
 		<Unit filename="explosion.cpp" />
@@ -84,9 +87,6 @@
 		<Unit filename="texture.h" />
 		<Unit filename="utils.cpp" />
 		<Unit filename="utils.h" />
-		<Unit filename="vendor/cpDebugDraw/ChipmunkDebugDraw.cpp" />
-		<Unit filename="vendor/cpDebugDraw/ChipmunkDebugDraw.h" />
-		<Unit filename="vendor/cpDebugDraw/DebugDrawImpl.cpp" />
 		<Unit filename="vendor/tinyxml/tinyxml2.cpp">
 			<Option weight="59" />
 		</Unit>

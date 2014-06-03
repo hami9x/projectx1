@@ -62,12 +62,16 @@
 		<Unit filename="../map.tmx" />
 		<Unit filename="../ops.cpp" />
 		<Unit filename="../ops.h" />
+		<Unit filename="../physics.cpp" />
+		<Unit filename="../physics.h" />
 		<Unit filename="../player.cpp" />
 		<Unit filename="../proto/clientinfo.pb.cc" />
 		<Unit filename="../proto/clientinfo.pb.h" />
 		<Unit filename="../proto/player.pb.cc" />
 		<Unit filename="../proto/player.pb.h" />
 		<Unit filename="../texture.cpp" />
+		<Unit filename="../utils.cpp" />
+		<Unit filename="../utils.h" />
 		<Unit filename="../vendor/tinyxml/tinyxml2.cpp" />
 		<Unit filename="../vendor/tinyxml/tinyxml2.h" />
 		<Unit filename="../vendor/tmxparser/src/tmxparser.cpp" />
