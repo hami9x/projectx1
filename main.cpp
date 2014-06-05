@@ -359,7 +359,6 @@ class Application {
 
             Sleep(5);
             enet_uint32 frameOffset = enet_time_get()-lastFrameTime;
-            printf("fps: %u\n", enet_time_get());
         }
         ChipmunkDebugDrawCleanup();
         Entity::freeAll(players, space);
