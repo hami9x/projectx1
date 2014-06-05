@@ -23,6 +23,7 @@
 #include "bullet.h"
 #include "client.h"
 #include "syncer.h"
+#include "skill.h"
 #include "proto/player.pb.h"
 #include "proto/clientinfo.pb.h"
 
@@ -84,7 +85,21 @@ void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFon
     Text hptxt(num,mFont, {94,19,83});
     hptxt.render(mRenderer,x+10,y+35,200);
 }
-
+void loadIcon(std::string path,int x , int y, SDL_Renderer *renderer){
+    Texture icon;
+    icon.loadFromFile(renderer,path.c_str());
+    icon.render(renderer,x,y);
+}
+void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skillmanager* sManager , int skillNum){
+    if (sManager->cdCheck(skillNum) < 1) {
+        Texture cooldownBox;
+        cooldownBox.loadFromFile(renderer,"cooldown.png");
+        cooldownBox.setBlendMode(SDL_BLENDMODE_BLEND);
+        cooldownBox.setAlpha(100);
+        SDL_Rect cdBox = {0,0,30-30*sManager->cdCheck(skillNum),30};
+        cooldownBox.render(renderer,x,y,&cdBox);
+    }
+}
 void drawFPSInfo(SDL_Renderer * renderer, int fps, int x, int y, TTF_Font *font) {
     char tx[50]; sprintf(tx, "FPS: %d", fps);
     Text fpsTxt(tx, font, {94,19,83});
@@ -137,7 +152,7 @@ class Application {
         if (error != TmxReturn::kSuccess) {
             printf("Tmx parse error. Code %d.\n", error);
         }
-
+        Skillmanager sManager;
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
         EntityCollection players = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, &plImg, physics.space());
@@ -198,7 +213,7 @@ class Application {
                 }
                 else
                 {
-                    p1.handleEvent(e, mRenderer, physics.space());
+                    p1.handleEvent(e, mRenderer, physics.space(), &sManager, mvVect);
                 }
             }
             p1.rightPressCheck(mvVect);
@@ -231,7 +246,8 @@ class Application {
                 fps = 1000/ftime;
             }
             drawFPSInfo(mRenderer, fps, 20, 20, assets.defFont());
-
+            loadIcon("push.jpg", 5 , 65 , mRenderer);
+            drawCoolDown(5 ,65 ,mRenderer , &sManager ,1 );
             //Demo draw from SDL2_gfx
             //filledPieRGBA(mRenderer, 200, 200, 200, 0, 70, 100, 200, 100, 255);
 

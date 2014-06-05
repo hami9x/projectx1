@@ -3,3 +3,4 @@ vendor/
 *.layout
 bin
 obj
+*.exe

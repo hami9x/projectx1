@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "texture.h"
 #include "bullet.h"
+#include "skill.h"
 #include "proto/player.pb.h"
 
 const cpFloat PLAYER_RAD = 0.05f;
@@ -32,7 +33,7 @@ class Player {
         void render(SDL_Renderer *r);
 
         //Event Handler
-        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space);
+        void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, Skillmanager *sManager, cpVect & moveVect);
 
         void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time);
 
@@ -94,6 +95,8 @@ class Player {
         //Maximum bullet
         int maxAmmo;
         Bullet ammo[10];
+
+        cpVect mVectp;
 };
 
 }
