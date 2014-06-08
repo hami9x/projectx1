@@ -16,6 +16,7 @@ namespace xx {
         Lpressed=false;
         maxAmmo=5;
         cpBodySetUserData(mEntity->body(), this);
+        mVectp = cpvzero;
     }
 
     Player::~Player() {
@@ -45,7 +46,7 @@ namespace xx {
         }
     }
 
-    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space) {
+    void Player::handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, Skillmanager *sManager, cpVect & moveVect) {
         //Rotation
         if( e.type == SDL_MOUSEMOTION) {
             int x,y;
@@ -69,6 +70,15 @@ namespace xx {
             Lpressed = true;
         } else if ( e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT ) {
             Lpressed = false;
+        }
+
+        // If q was pressed
+        if ( (e.type == SDL_KEYDOWN) && (e.key.keysym.sym == SDLK_q)) {
+                if (sManager->cdCheck(1) == 1 ) {
+                    sManager->resetCd(1);
+                    mVectp = cpvmult(vectorForward(),50);
+                    moveVect = cpvadd(moveVect,mVectp);
+                }
         }
     }
 
@@ -119,7 +129,8 @@ namespace xx {
         }
 
         //Apply impulse
-        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), mVel, cpv(0, 0));
+        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpvadd(mVel,mVectp), cpv(0, 0));
+        mVectp = cpvzero;
         cpBody * body = mEntity->body();
         for(int i=0; i<=maxAmmo; i++)
             if( ammo[i].checkExist() )

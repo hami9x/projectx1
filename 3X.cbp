@@ -75,6 +75,8 @@
 		<Unit filename="proto/clientinfo.pb.h" />
 		<Unit filename="proto/player.pb.cc" />
 		<Unit filename="proto/player.pb.h" />
+		<Unit filename="skill.cpp" />
+		<Unit filename="skill.h" />
 		<Unit filename="syncer.cpp" />
 		<Unit filename="syncer.h" />
 		<Unit filename="text.cpp">

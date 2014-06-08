@@ -5,7 +5,6 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include "ChipmunkDebugDraw.h"
-
 #include "global.h"
 #include "player.h"
 #include "physics.h"

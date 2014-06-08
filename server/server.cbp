@@ -69,6 +69,8 @@
 		<Unit filename="../proto/clientinfo.pb.h" />
 		<Unit filename="../proto/player.pb.cc" />
 		<Unit filename="../proto/player.pb.h" />
+		<Unit filename="../skill.cpp" />
+		<Unit filename="../skill.h" />
 		<Unit filename="../texture.cpp" />
 		<Unit filename="../utils.cpp" />
 		<Unit filename="../utils.h" />
