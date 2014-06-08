@@ -34,7 +34,7 @@ class Player {
         //Event Handler
         void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space);
 
-        void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time);
+        void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time, cpFloat fireAngle);
 
         void rightPressCheck(cpVect & moveVect);
 
@@ -72,6 +72,8 @@ class Player {
         cpFloat posY() { return mEntity->body()->p.y; }
         cpFloat angle() { return mAngle; }
         cpFloat sensor() { return mEntity->sprite().height()/2; }
+        int firedNumber() { return mFiredNumber; }
+        cpFloat firedAngle(int i) { return mFiredAngle[i]; }
 
     private:
         //Velocity of player
@@ -94,6 +96,10 @@ class Player {
         //Maximum bullet
         int maxAmmo;
         Bullet ammo[10];
+
+        //Memory fired ammo
+        int mFiredNumber;
+        cpFloat mFiredAngle[5];
 };
 
 }

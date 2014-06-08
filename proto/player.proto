@@ -7,6 +7,8 @@ message PlayerChange {
   required int32 time = 1;
   required float angle = 2;
   optional PlayerMove move = 3;
+  optional int32 firedNumber = 4;
+  repeated float firedAngle = 5 [packed=true];
 }
 
 message PlayerUpdate {
@@ -16,6 +18,8 @@ message PlayerUpdate {
   required float posy = 4;
   required float velx = 5;
   required float vely = 6;
+  optional int32 firedNumber = 7;
+  repeated float firedAngle = 8 [packed=true];
 }
 
 message Update {

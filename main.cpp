@@ -179,6 +179,7 @@ class Application {
         utils::Timer fTimer(0), fpsTimer(300);
         uint32 ftime = 0;
         int fps;
+        cpFloat fireTime;
 
         //While application is running
         while( !quit )
@@ -205,7 +206,8 @@ class Application {
             printf("%f %f: \n", mvVect.x, mvVect.y);
 
             //Firing
-            //p1.handleFire(mRenderer, space, fireTime);
+            fireTime++;
+            p1.handleFire(mRenderer, physics.space(), fireTime, cpBodyGetAngle(p1.body()));
 
             //Move the aircraft
             p1.updateState();
