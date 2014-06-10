@@ -48,7 +48,8 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
     mAngle = player->angle();
     mPosX = player->posX();
     mPosY = player->posY();
-    mX = player->sensor();
+    //mX = player->sensor();
+    mPlayer = player;
 
     img.loadFromFile(r,BULLET_IMG);
     exist = true;
@@ -65,7 +66,7 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
 
     shape = cpBoxShapeNew(mBody, img.width(), img.height(), 0);
     cpShapeSetCollisionType(shape, BULLET_TYPE);
-    cpShapeSetSensor(shape, true);
+    //cpShapeSetSensor(shape, true);
     cpSpaceAddShape(space, shape);
     cpSpaceAddBody(space, mBody);
 
@@ -81,8 +82,6 @@ void Bullet::render(SDL_Renderer * r) {
     double t = sqrt( pow( pos.x - mPosX, 2 ) + pow( pos.y - mPosY, 2 ) );
     if( t > mRange)
        free();
-    if( t > mX )
-        cpShapeSetSensor(shape, false);
     img.render(r, (int)pos.x - cog.x, (int)pos.y - cog.y, NULL ,(double)rad2deg(mAngle), NULL, SDL_FLIP_NONE);
 }
 

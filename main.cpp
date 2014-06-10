@@ -138,7 +138,7 @@ class Application {
         //! Network setup
         enet_init();
         Client client;
-        //client.setOfflineMode();
+        client.setOfflineMode();
         client.connect("localhost", 1000);
         int playerId = client.playerId();
 

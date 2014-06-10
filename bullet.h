@@ -13,6 +13,8 @@ static const int BULLET_SPEED = 3;
 
 namespace xx {
 
+class Player;
+
 class Bullet {
     public:
         bool checkExist() { return exist; }
@@ -32,7 +34,9 @@ class Bullet {
         void moveBullet();
 
         //return body
-        cpBody *body() { return mBody; }
+        cpBody * body() { return mBody; }
+        Player * player() { return mPlayer; }
+
         //render
         void render(SDL_Renderer *r);
     private:
@@ -49,6 +53,7 @@ class Bullet {
         cpBody *mBody;
         cpFloat mPosX, mPosY,mX;
         cpFloat mAngle;
+        Player *mPlayer;
 };
 }
 #endif // BULLET_H_INCLUDED

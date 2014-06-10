@@ -26,6 +26,8 @@ static void planeCloudSepFunc(cpArbiter *arb, cpSpace *space, void*) {
 static cpBool bulletCloudBeginFunc(cpArbiter *arb, cpSpace *space, void*) {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
+
+    return false;
 }
 
 //Post-step: Ammo free
@@ -46,12 +48,14 @@ static cpBool bulletPlaneBeginFunc(cpArbiter *arb, cpSpace *space, void*) {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
 
-    cpBool check = cpShapeGetSensor(a);
-    if(!check){
+    if (((Bullet *)cpBodyGetUserData(cpShapeGetBody(a)))->player()->body() != cpShapeGetBody(b)) {
         printf("Hit plane\n");
 
         cpSpaceAddPostStepCallback( space, (cpPostStepFunc)ammoFree, a, NULL);
+
+        return true;
     }
+    return false;
 }
 
 Physics::Physics(uint32 timeStep) {
