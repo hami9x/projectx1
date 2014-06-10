@@ -4,6 +4,7 @@
 #include "global.h"
 #include "entity.h"
 #include "texture.h"
+#include "utils.h"
 #include "bullet.h"
 #include "skill.h"
 #include "proto/player.pb.h"
@@ -35,7 +36,7 @@ class Player {
         //Event Handler
         void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, Skillmanager *sManager, cpVect & moveVect);
 
-        void handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time, cpFloat fireAngle);
+        void handleFire(SDL_Renderer *r, cpSpace *space, utils::Timer & fireTimer, cpFloat fireAngle);
 
         void rightPressCheck(cpVect & moveVect);
 

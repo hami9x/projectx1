@@ -77,6 +77,7 @@ void Bullet::render(SDL_Renderer * r) {
     cpVect pos = cpBodyGetPosition(mBody);
     cpVect cog = cpBodyGetCenterOfGravity(mBody);
     cpShape *shape = mBody->shapeList;
+    cpBody * b = shape->body;
     double t = sqrt( pow( pos.x - mPosX, 2 ) + pow( pos.y - mPosY, 2 ) );
     if( t > mRange)
        free();

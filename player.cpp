@@ -82,17 +82,19 @@ namespace xx {
         }
     }
 
-    void Player::handleFire(SDL_Renderer *r, cpSpace *space, cpFloat &time, cpFloat fireAngle) {
+    void Player::handleFire(SDL_Renderer *r, cpSpace *space, utils::Timer & fireTimer, cpFloat fireAngle) {
         //If holding the left button
         if (Lpressed) {
             cpBody *body = mEntity->body();
             mAngle = fireAngle;
             mFiredNumber++;
             mFiredAngle[ mFiredNumber ] = mAngle;
-            for( int i=0; i<=maxAmmo; i++) {
-                if ( !ammo[i].checkExist() && time>2 ) {
-                    time = 0;
-                    ammo[i].createBullet(r, space, 500, this);
+            if (fireTimer.exceededReset()) {
+                for( int i=0; i<=maxAmmo; i++) {
+                    if ( !ammo[i].checkExist()) {
+                        ammo[i].createBullet(r, space, 500, this);
+                        break;
+                    }
                 }
             }
         }

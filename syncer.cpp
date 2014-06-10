@@ -61,9 +61,9 @@ void Syncer::playerSendUpdate(bool *stopped, cpVect * _mvVect) {
             m->set_mvectx(mvVect.x);
             m->set_mvecty(mvVect.y);
 
-//            pc.set_firednumber( mPlayer->firedNumber());
-//            for(int i=1; i<= mPlayer->firedNumber(); i++)
-//                pc.set_firedangle(i, mPlayer->firedAngle(i));
+            pc.set_firednumber( mPlayer->firedNumber());
+            for(int i=1; i<= mPlayer->firedNumber(); i++)
+                pc.add_firedangle(mPlayer->firedAngle(i));
 
             size = pc.ByteSize();
             pc.SerializeToArray(mClient->buffer(size), size);
