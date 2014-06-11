@@ -138,7 +138,7 @@ class Application {
         //! Network setup
         enet_init();
         Client client;
-        client.setOfflineMode();
+        //client.setOfflineMode();
         client.connect("localhost", 1000);
         int playerId = client.playerId();
 
@@ -218,7 +218,7 @@ class Application {
                 }
             }
             p1.rightPressCheck(mvVect);
-            printf("%f %f: \n", mvVect.x, mvVect.y);
+            //printf("%f %f: \n", mvVect.x, mvVect.y);
 
             //Firing
             p1.handleFire(mRenderer, physics.space(), fireTimer, cpBodyGetAngle(p1.body()));
