@@ -48,6 +48,8 @@
 			<Add option="-lmingw32 -lglew32s -lopengl32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf" />
 			<Add option="-lchipmunk -lSDLU -lenet -lprotobuf" />
 		</Linker>
+		<Unit filename="../animation.cpp" />
+		<Unit filename="../animation.h" />
 		<Unit filename="../bullet.cpp" />
 		<Unit filename="../cpDebugDraw/ChipmunkDebugDraw.cpp">
 			<Option weight="56" />

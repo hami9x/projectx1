@@ -17,7 +17,6 @@ namespace xx {
         maxAmmo=5;
         cpBodySetUserData(mEntity->body(), this);
         mVectp = cpvzero;
-        mFiredNumber = 0;
     }
 
     Player::~Player() {
@@ -87,11 +86,13 @@ namespace xx {
         //If holding the left button
         if (Lpressed) {
             if (fireTimer.exceededReset()) {
+                cpBody *body = mEntity->body();
+                mAngle = fireAngle;
+                mFiredNumber++;
+                mFiredAngle[ mFiredNumber ] = mAngle;
                 for( int i=0; i<=maxAmmo; i++) {
                     if ( !ammo[i].checkExist()) {
                         ammo[i].createBullet(r, space, 500, this);
-                        mAngle = fireAngle;
-                        mFiredAngle[ mFiredNumber++ ] = mAngle;
                         break;
                     }
                 }

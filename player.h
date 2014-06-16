@@ -52,10 +52,7 @@ class Player {
         int maxhp=10000;
 
         //body
-        cpBody *body() { return mEntity->body(); }
-
-        //free bullet
-        void freeBullet(Bullet a);
+        cpBody *body() { if (mEntity != NULL) return mEntity->body(); }
 
         //Hurt
         void hurt(int dam);
@@ -83,9 +80,6 @@ class Player {
 
         //Entity
         Entity *mEntity;
-
-        //Aircraft texture
-        Texture aircraft;
 
         //Rotation
         void rotLeft();

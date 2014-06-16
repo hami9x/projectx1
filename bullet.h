@@ -8,7 +8,7 @@
 
 
 static const std::string BULLET_IMG = "bullet.png";
-static const int BULLET_SPEED = 3;
+static const int BULLET_SPEED = 6;
 
 
 namespace xx {

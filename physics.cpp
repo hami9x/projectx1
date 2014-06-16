@@ -1,5 +1,6 @@
 #include "physics.h"
 #include "player.h"
+#include "animation.h"
 
 using namespace std;
 
@@ -41,6 +42,7 @@ static void ammoFree( cpSpace *space, cpShape *shape, void *unused) {
 //    for(int i=0; i < EXPLOSION_MAXIMUM_SPRITES; i++)
 //        if( !explosionCheck[i] )
 //            explosionSet(i, Body->p.x - 59, Body->p.y - 59);
+    Explosion(body->p.x - 59, body->p.y -59);
     ammo->free();
 }
 

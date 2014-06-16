@@ -66,7 +66,7 @@ int main(int argc, char* args[])
 
     initSDL();
 
-    Physics physics(16);
+    Physics physics(17);
     physics.setupCollisions();
 
     TmxMap m;
@@ -120,6 +120,10 @@ int main(int argc, char* args[])
     while (1)
     {
         ftime = fTimer.elapsed();
+        if (ftime > 0 && ftime < 17) {
+            Sleep(17-ftime);
+            ftime=17;
+        }
         //! Physics integration
         physics.step(ftime);
         //!
@@ -230,11 +234,11 @@ int main(int argc, char* args[])
                     //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
                     p->updateState();
                     cpBodySetAngle(p->body(), pc.angle());
-//                    for(int i=1; i<=pc.firednumber(); i++)
-//                    {
-//                        cpFloat t=3;
-//                        p->handleFire(renderer, space, t, pc.firedangle(i));
-//                    }
+                    for(int i=1; i<=pc.firednumber(); i++)
+                    {
+                        cpFloat t=3;
+                        p->handleFire(renderer, space, t, pc.firedangle(i));
+                    }
 //                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), 0, playerId,
 //                        cpBodyGetPosition(p->body()).x,
 //                        cpBodyGetPosition(p->body()).y,

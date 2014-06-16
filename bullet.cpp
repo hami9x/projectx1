@@ -9,6 +9,7 @@
 #include <math.h>
 #include "player.h"
 
+
 namespace xx {
 
 Bullet::Bullet() {
@@ -22,8 +23,13 @@ Bullet::~Bullet() {
     free();
 }
 
+int n = 0;
 void Bullet::free() {
     if (exist) {
+        if (mBody == NULL) {
+            return;
+        }
+        printf(":D:D %d\n", ++n);
         cpShape *shape = mBody->shapeList;
         cpSpace *space = cpBodyGetSpace( mBody );
 
@@ -45,6 +51,10 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
     //printf("in bullet %d\n", player);
     mVelX = player->velX();
     mVelY = player->velY();
+    cpVect v = cpv(mVelX, mVelY);
+    cpVect resV = cpvmult(cpvmult(v, 1./cpvlength(cpv(mVelX, mVelY))), BULLET_SPEED);
+    mVelX = resV.x;
+    mVelY = resV.y;
     mAngle = player->angle();
     mPosX = player->posX();
     mPosY = player->posY();
@@ -88,7 +98,7 @@ void Bullet::render(SDL_Renderer * r) {
 void Bullet::moveBullet() {
     mBody->p.x += mVelX;
     mBody->p.y += mVelY;
-    cpBodyApplyForceAtLocalPoint(mBody, cpv(mVelX, mVelY), cpv(0, 0));
+    //cpBodyApplyForceAtWorldPoint(mBody, cpv(mVelX, mVelY), cpv(0, 0));
 }
 
 }

@@ -26,6 +26,7 @@
 #include "skill.h"
 #include "proto/player.pb.h"
 #include "proto/clientinfo.pb.h"
+#include "animation.h"
 
 using namespace std;
 using namespace tmxparser;
@@ -138,12 +139,12 @@ class Application {
         //! Network setup
         enet_init();
         Client client;
-        //client.setOfflineMode();
+        client.setOfflineMode();
         client.connect("localhost", 1000);
         int playerId = client.playerId();
 
         //! Physics setup
-        Physics physics(16);
+        Physics physics(17);
         physics.setupCollisions();
 
         //! Load objects
@@ -166,6 +167,8 @@ class Application {
         Player p1(players[playerId-1]);
         //Assume we have 2 player only, this could be change later.
         Player p2(players[2-playerId]);
+
+        ExplosionCreate(mRenderer);
 
         cpVect mvVect = cpvzero;
 
@@ -200,10 +203,15 @@ class Application {
         while( !quit )
         {
             ftime = fTimer.elapsed();
+            if (ftime > 0 && ftime < 17) {
+                Sleep(17-ftime);
+                ftime=17;
+            }
             //! Physics integration
             physics.step(ftime);
             //!
             fTimer.reset();
+
             //Handle events on queue
             while( SDL_PollEvent( &e ) != 0 )
             {
@@ -218,7 +226,6 @@ class Application {
                 }
             }
             p1.rightPressCheck(mvVect);
-            //printf("%f %f: \n", mvVect.x, mvVect.y);
 
             //Firing
             p1.handleFire(mRenderer, physics.space(), fireTimer, cpBodyGetAngle(p1.body()));
@@ -243,6 +250,7 @@ class Application {
 
             drawPlayerHp(p1, mRenderer,0,0,assets.defFont());
             drawPlayerHp(p1, mRenderer,666,0,assets.defFont());
+
             if (ftime && fpsTimer.exceededReset()) {
                 fps = 1000/ftime;
             }
@@ -261,6 +269,7 @@ class Application {
             ChipmunkDebugDrawFlushRenderer();
             ChipmunkDebugDrawPopRenderer();
             SDLU_GL_RenderRestoreState(mRenderer);
+            ExplosionRender(mRenderer);
             //!!! End Rendering Area
         }
 

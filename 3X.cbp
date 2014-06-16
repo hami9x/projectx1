@@ -45,6 +45,8 @@
 		<Unit filename="NovaSquare.ttf" />
 		<Unit filename="aircraft.gif" />
 		<Unit filename="aircraft.png" />
+		<Unit filename="animation.cpp" />
+		<Unit filename="animation.h" />
 		<Unit filename="bullet.cpp" />
 		<Unit filename="bullet.h" />
 		<Unit filename="cb.bmp" />
@@ -55,8 +57,6 @@
 		<Unit filename="cpDebugDraw/DebugDrawImpl.cpp" />
 		<Unit filename="entity.cpp" />
 		<Unit filename="entity.h" />
-		<Unit filename="explosion.cpp" />
-		<Unit filename="explosion.h" />
 		<Unit filename="explosion.png" />
 		<Unit filename="global.h" />
 		<Unit filename="main.cpp">

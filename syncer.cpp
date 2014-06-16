@@ -53,6 +53,9 @@ void Syncer::playerSendUpdate(bool *stopped, cpVect * _mvVect) {
                 continue;
             }
             PlayerChange pc;
+            if (mPlayer == NULL) {
+                break;
+            }
             cpBody * body=mPlayer->body();
             pc.set_time(utils::now());
             //printf("Send: %f\n",cpBodyGetAngle(body));
@@ -89,7 +92,7 @@ void Syncer::updateBodies(Physics * physics, Update & update, bool updated) {
     google::protobuf::RepeatedPtrField<PlayerUpdate> pus = update.players();
     google::protobuf::RepeatedPtrField<PlayerUpdate>::iterator ii;
     for (ii = pus.begin(); ii != pus.end(); ++ii) {
-        printf("DKDFKLLLLLLLLL\n");
+        //printf("DKDFKLLLLLLLLL\n");
         PlayerUpdate pu = *ii;
         cpVect svpos = cpv(pu.posx(), pu.posy());
 
