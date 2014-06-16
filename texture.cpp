@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <cassert>
 #include <stdio.h>
+#include <iostream>
 
 namespace xx {
 
@@ -16,6 +17,7 @@ Texture::Texture()
 
 Texture::~Texture()
 {
+    std::cout << "dest free " << mTexture << std::endl;
 	//Deallocate
 	free();
 }
@@ -66,6 +68,7 @@ void Texture::free()
 	//Free texture if it exists
 	if( mTexture != NULL )
 	{
+        std::cout << mTexture << std::endl;
 		SDL_DestroyTexture( mTexture );
 		mTexture = NULL;
 		mWidth = 0;

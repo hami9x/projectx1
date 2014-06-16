@@ -33,6 +33,8 @@ class Bullet {
         //Move the bullet
         void moveBullet();
 
+        void destroy();
+
         //return body
         cpBody * body() { return mBody; }
         Player * player() { return mPlayer; }
@@ -54,6 +56,7 @@ class Bullet {
         cpFloat mPosX, mPosY,mX;
         cpFloat mAngle;
         Player *mPlayer;
+        bool loadedImg;
 };
 }
 #endif // BULLET_H_INCLUDED

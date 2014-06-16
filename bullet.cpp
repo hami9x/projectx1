@@ -5,6 +5,7 @@
 #include <string>
 #include <SDL.h>
 #include <chipmunk_private.h>
+#include <iostream>
 #include <stdio.h>
 #include <math.h>
 #include "player.h"
@@ -17,28 +18,32 @@ Bullet::Bullet() {
     mVelY=5;
     mRange=0;
     exist=false;
+    loadedImg=false;
 }
 
 Bullet::~Bullet() {
-    free();
+}
+
+void Bullet::free() {
+    img.free();
 }
 
 int n = 0;
-void Bullet::free() {
+void Bullet::destroy() {
     if (exist) {
         if (mBody == NULL) {
             return;
         }
-        printf(":D:D %d\n", ++n);
+        std::cout << mBody; printf(" :D %d\n", ++n);
         cpShape *shape = mBody->shapeList;
         cpSpace *space = cpBodyGetSpace( mBody );
 
-        img.free();
         cpSpaceRemoveShape( space, shape );
         cpSpaceRemoveBody( space, mBody );
         cpShapeFree( shape );
         cpBodyFree( mBody );
 
+        mBody = NULL;
         exist = false;
 
     }
@@ -61,7 +66,11 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
     //mX = player->sensor();
     mPlayer = player;
 
-    img.loadFromFile(r,BULLET_IMG);
+    if (!loadedImg) {
+        loadedImg = true;
+        img.loadFromFile(r,BULLET_IMG);
+    }
+
     exist = true;
     mRange = range;
     mBody = cpBodyNew(10.f, cpMomentForBox(10.f, img.width(), img.height()));
@@ -90,9 +99,10 @@ void Bullet::render(SDL_Renderer * r) {
     cpShape *shape = mBody->shapeList;
     cpBody * b = shape->body;
     double t = sqrt( pow( pos.x - mPosX, 2 ) + pow( pos.y - mPosY, 2 ) );
-    if( t > mRange)
-       free();
     img.render(r, (int)pos.x - cog.x, (int)pos.y - cog.y, NULL ,(double)rad2deg(mAngle), NULL, SDL_FLIP_NONE);
+    if( t > mRange) {
+       destroy();
+    }
 }
 
 void Bullet::moveBullet() {

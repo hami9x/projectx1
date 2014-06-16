@@ -57,6 +57,9 @@ class Player {
         //Hurt
         void hurt(int dam);
 
+        //free bullets
+        void free();
+
         void setMove(cpVect vel) { mVel = vel; }
 
         cpVect vectorForward();

@@ -14,12 +14,19 @@ namespace xx {
         mVel = cpvzero;
         Rpressed=false;
         Lpressed=false;
-        maxAmmo=5;
+        maxAmmo=1;
         cpBodySetUserData(mEntity->body(), this);
         mVectp = cpvzero;
     }
 
     Player::~Player() {
+    }
+
+    void Player::free() {
+        for(int i=0; i<maxAmmo; i++) {
+            ammo[i].destroy();
+            ammo[i].free();
+        }
     }
 
     cpFloat angleAdd(cpFloat angle, cpFloat delta) {
@@ -90,7 +97,7 @@ namespace xx {
                 mAngle = fireAngle;
                 mFiredNumber++;
                 mFiredAngle[ mFiredNumber ] = mAngle;
-                for( int i=0; i<=maxAmmo; i++) {
+                for( int i=0; i<maxAmmo; i++) {
                     if ( !ammo[i].checkExist()) {
                         ammo[i].createBullet(r, space, 500, this);
                         break;
@@ -117,7 +124,7 @@ namespace xx {
     }
 
     void Player::renderBullets(SDL_Renderer * r) {
-        for(int i=0; i<=maxAmmo; i++)
+        for(int i=0; i<maxAmmo; i++)
         {
             if( ammo[i].checkExist() )
                 ammo[i].render(r);
@@ -134,7 +141,7 @@ namespace xx {
         cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpvadd(mVel,mVectp), cpv(0, 0));
         mVectp = cpvzero;
         cpBody * body = mEntity->body();
-        for(int i=0; i<=maxAmmo; i++)
+        for(int i=0; i<maxAmmo; i++)
             if( ammo[i].checkExist() )
                 ammo[i].moveBullet();
 

@@ -43,7 +43,8 @@ static void ammoFree( cpSpace *space, cpShape *shape, void *unused) {
 //        if( !explosionCheck[i] )
 //            explosionSet(i, Body->p.x - 59, Body->p.y - 59);
     Explosion(body->p.x - 59, body->p.y -59);
-    ammo->free();
+    printf("Post step free");
+    ammo->destroy();
 }
 
 static cpBool bulletPlaneBeginFunc(cpArbiter *arb, cpSpace *space, void*) {
