@@ -7,25 +7,27 @@
 #include "bullet.h"
 
 namespace xx {
+    const int Player::mMaxAmmo = 5;
+    const int Player::MAX_FIREANGLES = 30;
 
-    Player::Player(Entity * e) {
-        mEntity=e;
-        //Initialize
-        mVel = cpvzero;
-        Rpressed=false;
-        Lpressed=false;
-        maxAmmo=1;
+    Player::Player(Entity * e):
+        mVel(cpvzero),
+        mEntity(e),
+        Rpressed(false),
+        Lpressed(false),
+        mFiredNumber(0),
+        mVectp(cpvzero)
+    {
         cpBodySetUserData(mEntity->body(), this);
-        mVectp = cpvzero;
     }
 
     Player::~Player() {
     }
 
     void Player::free() {
-        for(int i=0; i<maxAmmo; i++) {
-            ammo[i].destroy();
-            ammo[i].free();
+        for(int i=0; i<mMaxAmmo; i++) {
+            mAmmo[i].destroy();
+            mAmmo[i].free();
         }
     }
 
@@ -93,13 +95,13 @@ namespace xx {
         //If holding the left button
         if (Lpressed) {
             if (fireTimer.exceededReset()) {
-                cpBody *body = mEntity->body();
-                mAngle = fireAngle;
-                mFiredNumber++;
-                mFiredAngle[ mFiredNumber ] = mAngle;
-                for( int i=0; i<maxAmmo; i++) {
-                    if ( !ammo[i].checkExist()) {
-                        ammo[i].createBullet(r, space, 500, this);
+//                mAngle = fireAngle;
+//                if (mFiredNumber < MAX_FIREANGLES) {
+//                    mFiredAngle[ mFiredNumber++ ] = mAngle;
+//                }
+                for( int i=0; i<mMaxAmmo; i++) {
+                    if ( !mAmmo[i].checkExist()) {
+                        mAmmo[i].createBullet(r, space, 700, this);
                         break;
                     }
                 }
@@ -124,10 +126,10 @@ namespace xx {
     }
 
     void Player::renderBullets(SDL_Renderer * r) {
-        for(int i=0; i<maxAmmo; i++)
+        for(int i=0; i<mMaxAmmo; i++)
         {
-            if( ammo[i].checkExist() )
-                ammo[i].render(r);
+            if( mAmmo[i].checkExist() )
+                mAmmo[i].render(r);
         }
     }
 
@@ -141,9 +143,9 @@ namespace xx {
         cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpvadd(mVel,mVectp), cpv(0, 0));
         mVectp = cpvzero;
         cpBody * body = mEntity->body();
-        for(int i=0; i<maxAmmo; i++)
-            if( ammo[i].checkExist() )
-                ammo[i].moveBullet();
+        for(int i=0; i<mMaxAmmo; i++)
+            if( mAmmo[i].checkExist() )
+                mAmmo[i].moveBullet();
 
         //Move around screen
         if( body->p.x > SCREEN_WIDTH + mEntity->width()/2 )

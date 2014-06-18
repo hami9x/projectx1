@@ -4,10 +4,11 @@
 #include <enet/enet.h>
 
 namespace xx {
-Skill::Skill(){
+Skill::Skill(): mCd(0) {
     mTimer = 0;
 }
-float Skill::coolDownCheck(){
+
+float Skill::coolDownCheck() {
     enet_uint32 now = enet_time_get();
     if (((float)(now - mTimer) / mCd > 1.00) || mTimer == 0 ) {
         return 1.00;
@@ -15,12 +16,14 @@ float Skill::coolDownCheck(){
         return (float)(now - mTimer) / mCd;
     }
 }
-Skill::~Skill()
-{
+Skill::~Skill() {
 }
-Skillmanager::Skillmanager(){
+
+Skillmanager::Skillmanager() {
     mSkill[1].setCd(5000);
 }
-Skillmanager::~Skillmanager(){
+
+Skillmanager::~Skillmanager() {
 }
+
 }

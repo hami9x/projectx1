@@ -5,7 +5,7 @@
 
 namespace xx {
 
-    Animation::Animation() {
+    Animation::Animation(): currentFrame(-1), frameRate(0), totalFrame(-1), mX(0), mY(0) {
     }
 
     Animation::~Animation() {}

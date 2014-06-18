@@ -192,7 +192,7 @@ int main(int argc, char* args[])
 
         ClientInfo ci;
         PlayerUpdate pu;
-        ENetPacket * packet;
+        //ENetPacket * packet;
 
         switch (event.type)
         {

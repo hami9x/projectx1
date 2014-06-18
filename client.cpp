@@ -5,7 +5,14 @@ using namespace std;
 
 namespace xx {
 
-Client::Client() {
+Client::Client():
+    mClient(NULL),
+    mHost(NULL),
+    mPlayerId(-1),
+    mBuffer(NULL),
+    mBuffSize(0),
+    mOfflineMode(false)
+ {
     mClient = enet_host_create(NULL /* create a client host */,
                 1 /* only allow 1 outgoing connection */,
                 10,
@@ -16,11 +23,6 @@ Client::Client() {
         fprintf(stderr, "An error occurred while trying to create an ENet client host.\n");
         exit(EXIT_FAILURE);
     }
-    mPlayerId = -1;
-    mBuffer = 0;
-    mBuffSize = 0;
-    mOfflineMode = false;
-    mEvent.packet = NULL;
 }
 
 Client::~Client() {
@@ -119,6 +121,7 @@ void Client::send(int channel) {
         printf("Buffer empty, please put data into the buffer first.\n");
         exit(EXIT_FAILURE);
     }
+
     ENetPacket * packet = enet_packet_create(mBuffer, mBuffSize, 0);
     enet_peer_send(mHost, channel, packet);
     enet_host_flush(mClient);
@@ -126,6 +129,9 @@ void Client::send(int channel) {
 }
 
 void* Client::buffer(int size) {
+    if (mBuffer != NULL) {
+        free(mBuffer);
+    }
     mBuffer = malloc(size);
     mBuffSize = size;
     return mBuffer;

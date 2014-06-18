@@ -83,13 +83,13 @@ void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFon
     strcat(num,"/");
     sprintf(temp,"%d",p.maxhp);
     strcat(num,temp);
-    //Text hptxt(num,mFont, {94,19,83});
-    //hptxt.render(mRenderer,x+10,y+35,200);
+    Text hptxt(num,mFont, {94,19,83});
+    hptxt.render(mRenderer,x+10,y+35,200);
 }
 void loadIcon(std::string path,int x , int y, SDL_Renderer *renderer){
-    //Texture icon;
-    //icon.loadFromFile(renderer,path.c_str());
-    //icon.render(renderer,x,y);
+    Texture icon;
+    icon.loadFromFile(renderer,path.c_str());
+    icon.render(renderer,x,y);
 }
 void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skillmanager* sManager , int skillNum){
     if (sManager->cdCheck(skillNum) < 1) {
@@ -103,8 +103,8 @@ void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skillmanager* sManager 
 }
 void drawFPSInfo(SDL_Renderer * renderer, int fps, int x, int y, TTF_Font *font) {
     char tx[50]; sprintf(tx, "FPS: %d", fps);
-    //Text fpsTxt(tx, font, {94,19,83});
-    //fpsTxt.render(renderer, x, y, 300);
+    Text fpsTxt(tx, font, {94,19,83});
+    fpsTxt.render(renderer, x, y, 300);
 }
 
 void enet_init() {
@@ -178,8 +178,8 @@ class Application {
         bool stopped = false;
         Update update;
         bool updated = false;
-        //std::thread ut1(&Syncer::playerHostSync, syncer, &stopped, std::ref(update), std::ref(updated));
-        //std::thread ut2(&Syncer::playerSendUpdate, syncer, &stopped, &mvVect);
+        std::thread ut1(&Syncer::playerHostSync, syncer, &stopped, std::ref(update), std::ref(updated));
+        std::thread ut2(&Syncer::playerSendUpdate, syncer, &stopped, &mvVect);
 
         //!
         //
@@ -195,14 +195,13 @@ class Application {
         bool quit = false;
         SDL_Event e;
         utils::Timer fTimer(0), fpsTimer(300);
-        uint32 ftime = 0;
         int fps;
         utils::Timer fireTimer(1000);
 
         //While application is running
         while( !quit )
         {
-            ftime = fTimer.elapsed();
+            uint32 ftime = fTimer.elapsed();
             if (ftime > 0 && ftime < 17) {
                 Sleep(17-ftime);
                 ftime=17;
@@ -274,17 +273,19 @@ class Application {
         }
 
         stopped = true;
-        //Sleep(300);
-        //ut1.join();
-        //ut2.join();
+        Sleep(300);
+        ut1.join();
+        ut2.join();
 
         ChipmunkDebugDrawCleanup();
         p1.free();
         p2.free();
+
         Entity::freeAll(players, physics.space());
         Entity::freeAll(clouds, physics.space());
         physics.free();
 
+        return 0;
     }
 
     bool loadExtensions()

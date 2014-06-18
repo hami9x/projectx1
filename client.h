@@ -7,7 +7,6 @@ namespace xx {
 class Client {
 private:
     ENetHost *mClient;
-    ENetEvent mEvent;
     ENetPeer *mHost;
     int mPlayerId;
     void * mBuffer;

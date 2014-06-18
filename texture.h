@@ -38,10 +38,10 @@ namespace xx {
             //Gets image dimensions
             int width();
             int height();
+            SDL_Texture* mTexture;
 
         private:
             //The actual hardware texture
-            SDL_Texture* mTexture;
 
             //Image dimensions
             int mWidth;

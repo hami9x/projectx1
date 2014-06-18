@@ -17,10 +17,8 @@ Syncer::~Syncer() {
 }
 
 void Syncer::playerHostSync(bool *stopped, Update & update, bool & updated) {
-    ENetPacket * packet;
-
     while(!(*stopped)) {
-        packet = mClient->recv(5000);
+        ENetPacket *packet = mClient->recv(5000);
         if (packet != NULL) {
             update.ParseFromArray(packet->data, packet->dataLength);
             updated = true;
@@ -67,14 +65,11 @@ void Syncer::playerSendUpdate(bool *stopped, cpVect * _mvVect) {
             for(int i=1; i<= mPlayer->firedNumber(); i++) {
                 pc.add_firedangle(mPlayer->firedAngle(i));
             }
-            //pc.set_firednumber(mPlayer->firedNumber());
+            pc.set_firednumber(mPlayer->firedNumber());
 
             size = pc.ByteSize();
             pc.SerializeToArray(mClient->buffer(size), size);
             mClient->send(1);
-            if (mvVect.x != 0 || mvVect.y != 0) {
-                //printf("::%f %f\n", pc.move().mvectx(), pc.move().mvecty());
-            }
             *_mvVect = cpvzero;
         }
         std::chrono::milliseconds dura(20);
@@ -124,7 +119,6 @@ void Syncer::updateBodies(Physics * physics, Update & update, bool updated) {
             cpBodySetPosition(p->body(), svpos);
             physics->step(timeoffs);
             cpBodySetAngle(p->body(), pu.angle());
-            cpVect pos2 = cpBodyGetPosition(p->body());
             //printf(">>> %f <<<\n", cpvdist(pos, pos2));
             //printf("%f<< \n", timeStep*(timeoffs/ftavg));
         } else if (dist >= 20) {

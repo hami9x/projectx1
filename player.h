@@ -3,7 +3,6 @@
 #include <SDL.h>
 #include "global.h"
 #include "entity.h"
-#include "texture.h"
 #include "utils.h"
 #include "bullet.h"
 #include "skill.h"
@@ -22,7 +21,11 @@ class Player {
         constexpr static int sHeight=SCREEN_HEIGHT;
 
         //Default constructor
-        Player() {}
+        Player():
+            mEntity(NULL),
+            Rpressed(false), Lpressed(false),
+            mFiredNumber(0)
+        {}
 
         //Initializes the variables
         Player(Entity *);
@@ -52,7 +55,7 @@ class Player {
         int maxhp=10000;
 
         //body
-        cpBody *body() { if (mEntity != NULL) return mEntity->body(); }
+        cpBody *body() { if (mEntity != NULL) return mEntity->body(); else return NULL; }
 
         //Hurt
         void hurt(int dam);
@@ -60,7 +63,7 @@ class Player {
         //free bullets
         void free();
 
-        void setMove(cpVect vel) { mVel = vel; }
+        //void setMove(cpVect vel) { mVel = vel; }
 
         cpVect vectorForward();
 
@@ -73,9 +76,12 @@ class Player {
         cpFloat posX() { return mEntity->body()->p.x; }
         cpFloat posY() { return mEntity->body()->p.y; }
         cpFloat angle() { return mAngle; }
-        cpFloat sensor() { return mEntity->sprite().height()/2; }
+        //cpFloat sensor() { return mEntity->sprite().height()/2; }
         int firedNumber() { return mFiredNumber; }
         cpFloat firedAngle(int i) { return mFiredAngle[i]; }
+
+        static const int mMaxAmmo;
+        static const int MAX_FIREANGLES;
 
     private:
         //Velocity of player
@@ -90,16 +96,15 @@ class Player {
         cpFloat mAngle;
 
         //check if button press or not
-        bool Rpressed,Lpressed;
+        bool Rpressed, Lpressed;
+
+        int mFiredNumber;
 
         //Maximum bullet
-        int maxAmmo;
-        Bullet ammo[10];
-
+        Bullet mAmmo[10];
 
         //Memory fired ammo
-        int mFiredNumber;
-        cpFloat mFiredAngle[5];
+        cpFloat mFiredAngle[30];
 
         cpVect mVectp;
 

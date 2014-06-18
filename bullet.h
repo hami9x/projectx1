@@ -8,7 +8,7 @@
 
 
 static const std::string BULLET_IMG = "bullet.png";
-static const int BULLET_SPEED = 6;
+static const int BULLET_SPEED = 4;
 
 
 namespace xx {
@@ -17,7 +17,7 @@ class Player;
 
 class Bullet {
     public:
-        bool checkExist() { return exist; }
+        bool checkExist() { return mExist; }
         //Initializes the variables
         Bullet();
 
@@ -50,13 +50,13 @@ class Bullet {
 
         //Bullet properties
         double mRange;//maximum range
-        double fRange;//flying range
-        bool exist;
+        bool mExist;
         cpBody *mBody;
         cpFloat mPosX, mPosY,mX;
-        cpFloat mAngle;
+        bool mLoadedImg;
         Player *mPlayer;
-        bool loadedImg;
+        cpFloat mInitialAngle;
 };
+
 }
 #endif // BULLET_H_INCLUDED
