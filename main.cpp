@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <ctime>
 #include <thread>
 #include <SDLU.h>
 #include <enet/enet.h>
@@ -36,12 +37,14 @@ using namespace xx;
 //Class to manage asset objects
 class Assets {
     TTF_Font *mDefFont;
+    TTF_Font *mResFont;
 
     public:
 
     TTF_Font *defFont() { return mDefFont; }
+    TTF_Font *resultFont() { return mResFont; }
 
-    Assets(): mDefFont(NULL)
+    Assets(): mDefFont(NULL), mResFont(NULL)
     {
     }
 
@@ -49,9 +52,10 @@ class Assets {
     {
         //Open the font
         mDefFont = TTF_OpenFont( "NovaSquare.ttf", 20 );
-        if( mDefFont == NULL )
+        mResFont = TTF_OpenFont( "NovaSquare.ttf", 50 );
+        if( mDefFont == NULL || mResFont == NULL)
         {
-            printf( "Failed to load thefont! SDL_ttf Error: %s\n", TTF_GetError() );
+            printf( "Failed to load the fonts! SDL_ttf Error: %s\n", TTF_GetError() );
             return false;
         }
 
@@ -65,6 +69,12 @@ class Assets {
         mDefFont = NULL;
     }
 };
+
+void drawResult(SDL_Renderer * r, TTF_Font *font, bool thisplayer) {
+    string text = thisplayer ? "You win, grats." : "You fuckin lost!";
+    Text txt(text, font, {200, 0, 0});
+    txt.render(r, SCREEN_WIDTH/2 + rand() % 20 - 40, SCREEN_HEIGHT/2 + rand() % 20 - 40, 400);
+}
 
 void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFont){
     char num[100]="HP: ",temp[100]="";
@@ -137,6 +147,7 @@ class Application {
     }
 
     int start() {
+        srand(time(NULL));
         //! Network setup
         enet_init();
         Client client;
@@ -177,6 +188,7 @@ class Application {
         Syncer syncer(&client, &p1, &p2);
         //syncer.start(&mvVect);
         bool stopped = false;
+        int playerWin = 0;
         Update update;
         bool updated = false;
         std::thread ut1(&Syncer::playerHostSync, syncer, &stopped, std::ref(update), std::ref(updated));
@@ -235,6 +247,16 @@ class Application {
             p1.renderBullets(mRenderer);
 
             syncer.updateBodies(&physics, update, updated);
+
+            if (playerWin == 0) {
+                if (p1.hp() == 0) {
+                    playerWin = 2;
+                } else if (p2.hp() == 0) {
+                    playerWin = 1;
+                }
+            } else {
+                drawResult(mRenderer, assets.resultFont(), playerWin == 1);
+            }
 
             //!!! Rendering Area
             //!!  Khong phan su mien vao :v
