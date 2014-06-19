@@ -20,6 +20,7 @@ message PlayerUpdate {
   required float vely = 6;
   optional int32 firedNumber = 7;
   repeated float firedAngle = 8;
+  required int32 hp = 9;
 }
 
 message Update {

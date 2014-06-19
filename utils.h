@@ -15,7 +15,7 @@ namespace xx {
             uint32 mStart;
 
         public:
-            Timer(long interval);
+            Timer(long interval = 0);
             void reset();
             uint32 elapsed();
             bool exceededReset();

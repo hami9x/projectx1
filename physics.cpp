@@ -14,14 +14,14 @@ void planeCloud(cpShape * planeShape, int num) {
 static cpBool planeCloudBeginFunc(cpArbiter *arb, cpSpace *space, void*) {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
-    planeCloud(a, 1);
+    planeCloud(a, 5);
     return false;
 }
 
 static void planeCloudSepFunc(cpArbiter *arb, cpSpace *space, void*) {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
-    planeCloud(a, -1);
+    planeCloud(a, -5);
 }
 
 static cpBool bulletCloudBeginFunc(cpArbiter *arb, cpSpace *space, void*) {
@@ -50,9 +50,11 @@ static void ammoFree( cpSpace *space, cpShape *shape, void *unused) {
 static cpBool bulletPlaneBeginFunc(cpArbiter *arb, cpSpace *space, void*) {
     cpShape *a,*b;
     cpArbiterGetShapes(arb, &a,&b);
-
-    if (((Bullet *)cpBodyGetUserData(cpShapeGetBody(a)))->player()->body() != cpShapeGetBody(b)) {
+    cpBody *targetBody = cpShapeGetBody(b);
+    if (((Bullet *)cpBodyGetUserData(cpShapeGetBody(a)))->player()->body() != targetBody) {
         printf("Hit plane\n");
+        Player * player = (Player *)(cpBodyGetUserData(targetBody));
+        player->hurt(200);
 
         cpSpaceAddPostStepCallback( space, (cpPostStepFunc)ammoFree, a, NULL);
 

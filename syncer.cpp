@@ -86,12 +86,13 @@ void Syncer::updateBodies(Physics * physics, Update & update, bool updated) {
     google::protobuf::RepeatedPtrField<PlayerUpdate> pus = update.players();
     google::protobuf::RepeatedPtrField<PlayerUpdate>::iterator ii;
     for (ii = pus.begin(); ii != pus.end(); ++ii) {
-        //printf("DKDFKLLLLLLLLL\n");
         PlayerUpdate pu = *ii;
         cpVect svpos = cpv(pu.posx(), pu.posy());
+        mPlayer->setHp(pu.hp());
 
         //Update for the other player
         if (mClient->playerId() != pu.player()) {
+            mOtherPlayer->setHp(pu.hp());
             cpBody * pbody = mOtherPlayer->body();
             cpBodySetVelocity(pbody, cpv(pu.velx(), pu.vely()));
             cpBodySetAngle(pbody, pu.angle());

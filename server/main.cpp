@@ -127,6 +127,9 @@ int main(int argc, char* args[])
         }
         //! Physics integration
         physics.step(17);
+        for (auto & player: players) {
+            player->updateState();
+        }
         //!
         fTimer.reset();
         while( SDL_PollEvent( &e ) != 0 )
@@ -161,6 +164,8 @@ int main(int argc, char* args[])
                 pu.set_posy(pos.y);
                 pu.set_velx(vel.x);
                 pu.set_vely(vel.y);
+                pu.set_hp(players[i]->hp());
+
                 *u.add_players() = pu;
             }
 

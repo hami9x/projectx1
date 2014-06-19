@@ -76,13 +76,13 @@ void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFon
     SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
     SDL_RenderFillRect( mRenderer, &fillRect );
 
-    fillRect = { x+4, y+4, int((SCREEN_WIDTH/3 - 8)*(double)(p.hp)/p.maxhp), SCREEN_HEIGHT / 20 -8};
+    fillRect = { x+4, y+4, int((SCREEN_WIDTH/3 - 8)*(double)(p.hp())/p.maxHp()), SCREEN_HEIGHT / 20 -8};
     SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
     SDL_RenderFillRect( mRenderer, &fillRect );
-    sprintf(temp,"%d",p.hp);
+    sprintf(temp,"%d",p.hp());
     strcat(num,temp);
     strcat(num,"/");
-    sprintf(temp,"%d",p.maxhp);
+    sprintf(temp,"%d",p.maxHp());
     strcat(num,temp);
     Text hptxt(num,mFont, {94,19,83});
     hptxt.render(mRenderer,x+10,y+35,200);
@@ -249,7 +249,7 @@ class Application {
             Entity::renderAll(clouds, mRenderer);
 
             drawPlayerHp(p1, mRenderer,0,0,assets.defFont());
-            drawPlayerHp(p1, mRenderer,666,0,assets.defFont());
+            drawPlayerHp(p2, mRenderer,666,0,assets.defFont());
 
             if (ftime && fpsTimer.exceededReset()) {
                 fps = 1000/ftime;

@@ -16,7 +16,10 @@ namespace xx {
         Rpressed(false),
         Lpressed(false),
         mFiredNumber(0),
-        mVectp(cpvzero)
+        mVectp(cpvzero),
+        mHp(1000),
+        mMaxHp(1000),
+        mHpLossTimer(150)
     {
         cpBodySetUserData(mEntity->body(), this);
     }
@@ -130,14 +133,21 @@ namespace xx {
         }
     }
 
+    //!!!WARNING: Code in this method should not depend on how many times this method is run
     void Player::updateState() {
         //states
-        if (mInCloud > 0) {
+        if (mHpLossTimer.exceededReset()) {
             hurt(mInCloud);
         }
 
         //Apply impulse
-        cpBodyApplyImpulseAtWorldPoint(mEntity->body(), cpvadd(mVel,mVectp), cpv(0, 0));
+        cpVect totalVel = cpvadd(mVel,mVectp);
+        if (cpvlength(totalVel) != 0) {
+            cpBodyApplyImpulseAtWorldPoint(mEntity->body(), totalVel, cpv(0, 0));
+            mVel = cpvzero;
+            mVectp = cpvzero;
+        }
+
         mVectp = cpvzero;
         cpBody * body = mEntity->body();
         for(int i=0; i<mMaxAmmo; i++)
@@ -156,9 +166,9 @@ namespace xx {
     }
 
     void Player::hurt(int dam){
-        hp -= dam;
-        if (hp < 0) {
-            hp = 0;
+        mHp -= dam;
+        if (mHp < 0) {
+            mHp = 0;
         }
     }
 

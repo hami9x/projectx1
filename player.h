@@ -49,11 +49,6 @@ class Player {
         void updateState();
         void renderBullets(SDL_Renderer *r);
 
-
-        //HP
-        int hp=10000;
-        int maxhp=10000;
-
         //body
         inline cpBody *body() { if (mEntity != NULL) return mEntity->body(); else return NULL; }
 
@@ -81,6 +76,9 @@ class Player {
         inline cpFloat firedAngle(int i) { return mFiredAngle[i]; }
         inline void setMove(cpVect v) { mVel = v; }
         inline void updateReset() { mFiredNumber = 0;}
+        inline int hp() { return mHp; }
+        inline void setHp(int hp) { mHp = hp; }
+        inline int maxHp() { return mMaxHp; }
 
         static const int mMaxAmmo;
         static const int MAX_FIREANGLES;
@@ -108,6 +106,12 @@ class Player {
         cpFloat mFiredAngle[30];
 
         cpVect mVectp;
+
+        //HP
+        int mHp;
+        int mMaxHp;
+
+        utils::Timer mHpLossTimer;
 
 };
 
