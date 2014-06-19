@@ -91,17 +91,16 @@ namespace xx {
         }
     }
 
-    void Player::handleFire(SDL_Renderer *r, cpSpace *space, utils::Timer & fireTimer, cpFloat fireAngle) {
+    void Player::handleFire(SDL_Renderer *r, cpSpace *space, utils::Timer & fireTimer, cpFloat fireAngle, bool isclient) {
         //If holding the left button
-        if (Lpressed) {
+        if (!isclient || Lpressed) {
             if (fireTimer.exceededReset()) {
-//                mAngle = fireAngle;
-//                if (mFiredNumber < MAX_FIREANGLES) {
-//                    mFiredAngle[ mFiredNumber++ ] = mAngle;
-//                }
+                if (isclient && mFiredNumber < MAX_FIREANGLES) {
+                    mFiredAngle[ mFiredNumber++ ] = cpBodyGetAngle(body());
+                }
                 for( int i=0; i<mMaxAmmo; i++) {
                     if ( !mAmmo[i].checkExist()) {
-                        mAmmo[i].createBullet(r, space, 700, this);
+                        mAmmo[i].createBullet(r, space, 700, this, !isclient);
                         break;
                     }
                 }
@@ -112,7 +111,6 @@ namespace xx {
     void Player::rotLeft() {
         cpFloat angle = cpBodyGetAngle(mEntity->body());
         angle = angleAdd(angle, -PLAYER_RAD);
-        mAngle = angle;
         cpBodySetAngle(mEntity->body(), angle);
         //printf("%f %f\n", mAngle, mEntity->body()->a);
     }
@@ -120,7 +118,6 @@ namespace xx {
     void Player::rotRight() {
         cpFloat angle = cpBodyGetAngle(mEntity->body());
         angle = angleAdd(angle, PLAYER_RAD);
-        mAngle = angle;
         cpBodySetAngle(mEntity->body(), angle);
          //printf("%f %f\n", mAngle, mEntity->body()->a);
     }
@@ -145,7 +142,7 @@ namespace xx {
         cpBody * body = mEntity->body();
         for(int i=0; i<mMaxAmmo; i++)
             if( mAmmo[i].checkExist() )
-                mAmmo[i].moveBullet();
+                mAmmo[i].move();
 
         //Move around screen
         if( body->p.x > SCREEN_WIDTH + mEntity->width()/2 )

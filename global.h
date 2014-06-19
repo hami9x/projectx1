@@ -8,11 +8,13 @@
 //Screen dimension constants
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 704;
+const int BULLET_WIDTH = 16;
+const int BULLET_HEIGHT = 34;
 
 //Collision Type
 const int PLANE_TYPE = 1;
 const int CLOUD_TYPE = 2;
-const int BULLET_TYPE =3;
+const int BULLET_TYPE = 3;
 
 inline double rad2deg(double radians) {
     return radians*(180.0/M_PI);

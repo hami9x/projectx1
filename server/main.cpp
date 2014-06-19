@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <enet/enet.h>
 #include <chipmunk_private.h>
 #include <SDLU.h>
@@ -80,9 +81,9 @@ int main(int argc, char* args[])
     EntityCollection playerEnts = Entity::fromTmxGetAll("planes", "aircraft", &m, 0, NULL, space);
     EntityCollection clouds = Entity::fromTmxGetAll("clouds", "clouds", &m, 0, NULL, space);
 
-    vector<Player> players(playerEnts.size());
-    for (size_t i=0; i<playerEnts.size(); i++) {
-        players[i] = Player(playerEnts[i]);
+    vector<unique_ptr<Player>> players;
+    for (auto ent: playerEnts) {
+        players.push_back(unique_ptr<Player>(new Player(ent)));
     }
 
     vector<bool> connected(playerEnts.size()+1, false);
@@ -107,7 +108,7 @@ int main(int argc, char* args[])
     ENetEvent event;
     int clientId = 1;
 
-    cpFloat timeStep = 1.0/60.;
+    //cpFloat timeStep = 1.0/60.;
     cpFloat updateInterval = 100;
     enet_uint32 updatedTime = enet_time_get();
 
@@ -125,7 +126,7 @@ int main(int argc, char* args[])
             ftime=17;
         }
         //! Physics integration
-        physics.step(ftime);
+        physics.step(17);
         //!
         fTimer.reset();
         while( SDL_PollEvent( &e ) != 0 )
@@ -146,10 +147,10 @@ int main(int argc, char* args[])
             u.set_time(now);
 
             for (size_t i=0; i<players.size(); ++i) {
+                auto & player = players[i];
                 if (!connected[i]) {
                     continue;
                 }
-                Player * player = &players[i];
                 PlayerUpdate pu;
                 pu.set_angle(cpBodyGetAngle(player->body()));
                 //printf("%f :)\n", cpBodyGetAngle(player->body()));
@@ -192,6 +193,7 @@ int main(int argc, char* args[])
 
         ClientInfo ci;
         PlayerUpdate pu;
+        utils::Timer fireTimer(0);
         //ENetPacket * packet;
 
         switch (event.type)
@@ -223,7 +225,7 @@ int main(int argc, char* args[])
 //                    event.channelID);
             if (event.channelID == 1) {
                 int playerId = (int)event.peer->data;
-                Player *p = &players[playerId-1];
+                auto & p = players[playerId-1];
                 PlayerChange pc;
                 pc.ParseFromArray(event.packet->data, event.packet->dataLength);
                 if (lastUpdated[playerId] < pc.time() || pc.time() == 0) {
@@ -234,10 +236,9 @@ int main(int argc, char* args[])
                     //p->setMove(cpvmult(p->vectorForward(), (cpFloat)m.forwards()));
                     p->updateState();
                     cpBodySetAngle(p->body(), pc.angle());
-                    for(int i=1; i<=pc.firednumber(); i++)
+                    for (int i=0; i<pc.firednumber(); i++)
                     {
-                        cpFloat t=3;
-                        p->handleFire(renderer, space, t, pc.firedangle(i));
+                        p->handleFire(renderer, space, fireTimer, pc.firedangle(i), false);
                     }
 //                    printf("Receive Player at time %u: %d forwards, %d , pos(%f,%f) , vel(%f,%f), angle(%f)\n", pc.time(), 0, playerId,
 //                        cpBodyGetPosition(p->body()).x,

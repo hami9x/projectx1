@@ -1,13 +1,15 @@
 #ifndef SYNCER_H_INCLUDED
 #define SYNCER_H_INCLUDED
 #include <thread>
-#include "client.h"
+#include "chipmunk_private.h"
 #include "utils.h"
-#include "player.h"
 #include "proto/player.pb.h"
-#include "physics.h"
 
 namespace xx {
+    class Client;
+    class Player;
+    class Physics;
+
     class Syncer {
         Client *mClient;
         Player *mPlayer;

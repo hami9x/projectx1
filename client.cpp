@@ -126,6 +126,7 @@ void Client::send(int channel) {
     enet_peer_send(mHost, channel, packet);
     enet_host_flush(mClient);
     free(mBuffer);
+    mBuffer = NULL;
 }
 
 void* Client::buffer(int size) {

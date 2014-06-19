@@ -28,10 +28,10 @@ class Bullet {
         void free();
 
         //Create bullet
-        void createBullet( SDL_Renderer *r, cpSpace *space, double range, cpDataPointer p );
+        void createBullet( SDL_Renderer *r, cpSpace *space, double range, Player * p, bool noRender = false);
 
         //Move the bullet
-        void moveBullet();
+        void move();
 
         void destroy();
 
@@ -56,6 +56,7 @@ class Bullet {
         bool mLoadedImg;
         Player *mPlayer;
         cpFloat mInitialAngle;
+        bool mNoRender;
 };
 
 }

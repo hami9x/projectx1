@@ -39,7 +39,7 @@ class Player {
         //Event Handler
         void handleEvent(SDL_Event e, SDL_Renderer *r, cpSpace *space, Skillmanager *sManager, cpVect & moveVect);
 
-        void handleFire(SDL_Renderer *r, cpSpace *space, utils::Timer & fireTimer, cpFloat fireAngle);
+        void handleFire(SDL_Renderer *r, cpSpace *space, utils::Timer & fireTimer, cpFloat fireAngle, bool isclient);
 
         void rightPressCheck(cpVect & moveVect);
 
@@ -55,7 +55,7 @@ class Player {
         int maxhp=10000;
 
         //body
-        cpBody *body() { if (mEntity != NULL) return mEntity->body(); else return NULL; }
+        inline cpBody *body() { if (mEntity != NULL) return mEntity->body(); else return NULL; }
 
         //Hurt
         void hurt(int dam);
@@ -71,14 +71,16 @@ class Player {
         int mInCloud=0;
 
         //Getter
-        double velX() { return sin( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
-        double velY() { return -cos( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
-        cpFloat posX() { return mEntity->body()->p.x; }
-        cpFloat posY() { return mEntity->body()->p.y; }
-        cpFloat angle() { return mAngle; }
+        inline double velX() { return sin( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
+        inline double velY() { return -cos( cpBodyGetAngle( mEntity->body() ) )*PLAYER_VEL; }
+        inline cpFloat posX() { return mEntity->body()->p.x; }
+        inline cpFloat posY() { return mEntity->body()->p.y; }
+        inline cpFloat angle() { return cpBodyGetAngle(mEntity->body()); }
         //cpFloat sensor() { return mEntity->sprite().height()/2; }
-        int firedNumber() { return mFiredNumber; }
-        cpFloat firedAngle(int i) { return mFiredAngle[i]; }
+        inline int firedNumber() { return mFiredNumber; }
+        inline cpFloat firedAngle(int i) { return mFiredAngle[i]; }
+        inline void setMove(cpVect v) { mVel = v; }
+        inline void updateReset() { mFiredNumber = 0;}
 
         static const int mMaxAmmo;
         static const int MAX_FIREANGLES;
@@ -93,7 +95,6 @@ class Player {
         //Rotation
         void rotLeft();
         void rotRight();
-        cpFloat mAngle;
 
         //check if button press or not
         bool Rpressed, Lpressed;

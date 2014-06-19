@@ -32,7 +32,8 @@ void Sprite::render(SDL_Renderer *renderer, int x, int y, double angle, SDL_Poin
 
 Entity::Entity(Sprite sprite, cpBody* body):
     mX(0), mY(0),
-    mSprite(sprite), mBody(body)
+    mBody(body),
+    mSprite(sprite)
 {}
 
 Entity::~Entity() {
@@ -52,7 +53,7 @@ cpVect tilePos(TmxMap *m, int k, int tileHeight) {
     int row = k/m->width+1;
     int col = k%m->width;
     //Tmx saves the tile as the bottom left one, so we have to shift it up
-    return cpVect{(int)col*m->tileWidth, (int)((int)row*m->tileHeight - tileHeight)};
+    return cpVect{cpFloat((int)col*m->tileWidth), cpFloat((int)((int)row*m->tileHeight - tileHeight))};
 }
 
 EntityCollection Entity::fromTmxGetAll(string ogName, string tilesetName, TmxMap *m, int tileid, Texture *image, cpSpace *space) {

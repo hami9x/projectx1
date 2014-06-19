@@ -21,7 +21,8 @@ Bullet::Bullet():
     mBody(NULL),
     mLoadedImg(false),
     mPlayer(NULL),
-    mInitialAngle(0)
+    mInitialAngle(0),
+    mNoRender(false)
 {}
 
 Bullet::~Bullet() {
@@ -53,9 +54,8 @@ void Bullet::destroy() {
     mRange = 0;
 }
 
-void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataPointer p) {
-
-    Player *player = (Player*)p;
+void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, Player * player, bool noRender) {
+    mNoRender = noRender;
     //printf("in bullet %d\n", player);
     mVelX = player->velX();
     mVelY = player->velY();
@@ -69,9 +69,9 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
     //mX = player->sensor();
     mPlayer = player;
 
-    if (!mLoadedImg) {
+    if (!mNoRender && !mLoadedImg) {
         mLoadedImg = true;
-        img.loadFromFile(r,BULLET_IMG);
+        img.loadFromFile(r, BULLET_IMG);
     }
 
     mExist = true;
@@ -84,10 +84,10 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
 
     //printf("%d \n",mBody->userData);
 
-    cpBodySetCenterOfGravity(mBody, cpv(img.width()/2, img.height()/2));
+    cpBodySetCenterOfGravity(mBody, cpv(BULLET_WIDTH/2, BULLET_HEIGHT/2));
     cpShape *shape;
 
-    shape = cpBoxShapeNew(mBody, img.width(), img.height(), 0);
+    shape = cpBoxShapeNew(mBody, BULLET_WIDTH, BULLET_HEIGHT, 0);
     cpShapeSetCollisionType(shape, BULLET_TYPE);
     //cpShapeSetSensor(shape, true);
     cpSpaceAddShape(space, shape);
@@ -97,7 +97,7 @@ void Bullet::createBullet(SDL_Renderer *r, cpSpace *space, double range, cpDataP
     cpBodySetUserData(mBody, this);
 
     cpBodySetVelocity(mBody, cpv(v.x, 100));
-    cpBodyApplyImpulseAtLocalPoint(mBody, cpv(0, -60), cpv(0, -img.height()/2));
+    cpBodyApplyImpulseAtLocalPoint(mBody, cpv(0, -60), cpv(0, -BULLET_HEIGHT/2));
     if (mInitialAngle < M_PI) {
         cpBodySetAngularVelocity(mBody, 1);
     } else {
@@ -111,23 +111,25 @@ void Bullet::render(SDL_Renderer * r) {
     cpFloat angle = cpBodyGetAngle(mBody);
     //cpShape *shape = mBody->shapeList;
     //cpBody * b = shape->body;
-    double t = sqrt( pow( pos.x - mPosX, 2 ) + pow( pos.y - mPosY, 2 ) );
-    img.render(r, (int)pos.x - cog.x, (int)pos.y - cog.y, NULL ,(double)rad2deg(angle), NULL, SDL_FLIP_NONE);
-    if ((cpBodyGetAngle(mBody) > M_PI) xor (mInitialAngle > M_PI)) {
-        cpBodySetAngle(mBody, M_PI);
-    }
-    if( t > mRange) {
-       destroy();
+    if (!mNoRender) {
+        img.render(r, (int)pos.x - cog.x, (int)pos.y - cog.y, NULL ,(double)rad2deg(angle), NULL, SDL_FLIP_NONE);
     }
 }
 
-void Bullet::moveBullet() {
+void Bullet::move() {
     //mBody->p.x += mVelX;
     //mBody->p.y += mVelY;
     //cpBodySetAngle(mBody, cpvtoangle(cpv(mVelX, mVelY)));
+    if ((cpBodyGetAngle(mBody) > M_PI) xor (mInitialAngle > M_PI)) {
+        cpBodySetAngle(mBody, M_PI);
+    }
     cpVect v = cpBodyGetVelocity(mBody);
     if (abs(v.y) <= 10) {
         cpBodySetVelocity(mBody, cpv(v.x, 100));
+    }
+
+    if(cpvdist(cpBodyGetPosition(mBody), cpv(mPosX, mPosY)) > mRange) {
+       destroy();
     }
 }
 

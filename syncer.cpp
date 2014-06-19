@@ -1,8 +1,10 @@
+#include "syncer.h"
+
 #include <thread>
 #include <chrono>
-#include "chipmunk_private.h"
-#include "syncer.h"
-#include "utils.h"
+#include "client.h"
+#include "player.h"
+#include "physics.h"
 
 namespace xx {
 
@@ -19,7 +21,7 @@ Syncer::~Syncer() {
 void Syncer::playerHostSync(bool *stopped, Update & update, bool & updated) {
     while(!(*stopped)) {
         ENetPacket *packet = mClient->recv(5000);
-        if (packet != NULL) {
+        if (packet != NULL && packet->data != NULL) {
             update.ParseFromArray(packet->data, packet->dataLength);
             updated = true;
 //                    printf ("A packet of length %u was received from %d on channel %u.\n",
@@ -46,10 +48,6 @@ void Syncer::playerSendUpdate(bool *stopped, cpVect * _mvVect) {
     while(!(*stopped)) {
         if (timer.exceededReset()) {
             cpVect mvVect = *_mvVect;
-            //printf("%f %f: \n", mvVect.x, mvVect.y);
-            if (cpvlength(mvVect) == 0) {
-                continue;
-            }
             PlayerChange pc;
             if (mPlayer == NULL) {
                 break;
@@ -62,10 +60,11 @@ void Syncer::playerSendUpdate(bool *stopped, cpVect * _mvVect) {
             m->set_mvectx(mvVect.x);
             m->set_mvecty(mvVect.y);
 
-            for(int i=1; i<= mPlayer->firedNumber(); i++) {
+            for(int i=0; i< mPlayer->firedNumber(); i++) {
                 pc.add_firedangle(mPlayer->firedAngle(i));
             }
             pc.set_firednumber(mPlayer->firedNumber());
+            mPlayer->updateReset();
 
             size = pc.ByteSize();
             pc.SerializeToArray(mClient->buffer(size), size);

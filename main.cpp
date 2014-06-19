@@ -19,6 +19,7 @@
 #include "text.h"
 #include "texture.h"
 #include "entity.h"
+#include "physics.h"
 #include "player.h"
 #include "bullet.h"
 #include "client.h"
@@ -75,7 +76,7 @@ void drawPlayerHp(Player & p, SDL_Renderer* mRenderer,int x,int y,TTF_Font *mFon
     SDL_SetRenderDrawColor( mRenderer, 0xFF,0xDD,0xFF, 0x00 );
     SDL_RenderFillRect( mRenderer, &fillRect );
 
-    fillRect = { x+4, y+4, (SCREEN_WIDTH/3 - 8)*(double)(p.hp)/p.maxhp, SCREEN_HEIGHT / 20 -8};
+    fillRect = { x+4, y+4, int((SCREEN_WIDTH/3 - 8)*(double)(p.hp)/p.maxhp), SCREEN_HEIGHT / 20 -8};
     SDL_SetRenderDrawColor( mRenderer, 0xFF, 0x99, 0xCC, 0x00 );
     SDL_RenderFillRect( mRenderer, &fillRect );
     sprintf(temp,"%d",p.hp);
@@ -97,7 +98,7 @@ void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skillmanager* sManager 
         cooldownBox.loadFromFile(renderer,"cooldown.png");
         cooldownBox.setBlendMode(SDL_BLENDMODE_BLEND);
         cooldownBox.setAlpha(100);
-        SDL_Rect cdBox = {0,0,30-30*sManager->cdCheck(skillNum),30};
+        SDL_Rect cdBox = {0, 0, int(30-30*sManager->cdCheck(skillNum)), 30};
         cooldownBox.render(renderer,x,y,&cdBox);
     }
 }
@@ -139,7 +140,7 @@ class Application {
         //! Network setup
         enet_init();
         Client client;
-        client.setOfflineMode();
+        //client.setOfflineMode();
         client.connect("localhost", 1000);
         int playerId = client.playerId();
 
@@ -227,7 +228,7 @@ class Application {
             p1.rightPressCheck(mvVect);
 
             //Firing
-            p1.handleFire(mRenderer, physics.space(), fireTimer, cpBodyGetAngle(p1.body()));
+            p1.handleFire(mRenderer, physics.space(), fireTimer, cpBodyGetAngle(p1.body()), true);
 
             //Move the aircraft
             p1.updateState();
