@@ -102,14 +102,17 @@ void loadIcon(std::string path,int x , int y, SDL_Renderer *renderer){
     icon.loadFromFile(renderer,path.c_str());
     icon.render(renderer,x,y);
 }
-void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skillmanager* sManager , int skillNum){
+void drawCoolDown(int x, int y, SDL_Renderer * renderer, Skillmanager* sManager , int skillNum, SDL_Texture* subTexture){
     if (sManager->cdCheck(skillNum) < 1) {
-        Texture cooldownBox;
-        cooldownBox.loadFromFile(renderer,"cooldown.png");
-        cooldownBox.setBlendMode(SDL_BLENDMODE_BLEND);
-        cooldownBox.setAlpha(100);
-        SDL_Rect cdBox = {0, 0, int(30-30*sManager->cdCheck(skillNum)), 30};
-        cooldownBox.render(renderer,x,y,&cdBox);
+        SDL_SetRenderTarget(renderer,subTexture);
+        SDL_SetRenderDrawColor( renderer,0, 0, 0, 0x00 );
+        SDL_RenderClear(renderer);
+        SDL_SetTextureBlendMode(subTexture, SDL_BLENDMODE_BLEND);
+        filledPieRGBA(renderer,60,60,60,-90,-90+360*(1-sManager->cdCheck(skillNum)),0,0,0,100);
+        SDL_SetRenderTarget(renderer,NULL);
+        SDL_Rect source = { 45 , 45 , 30 , 30};
+        SDL_Rect target = { x , y , 30, 30};
+        SDL_RenderCopy(renderer,subTexture,&source,&target);
     }
 }
 void drawFPSInfo(SDL_Renderer * renderer, int fps, int x, int y, TTF_Font *font) {
@@ -165,6 +168,7 @@ class Application {
         if (error != TmxReturn::kSuccess) {
             printf("Tmx parse error. Code %d.\n", error);
         }
+        auto subTexture = SDL_CreateTexture(mRenderer,SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 500, 500);
         Skillmanager sManager;
         Texture plImg;
         plImg.loadFromFile(mRenderer, "aircraft.png");
@@ -261,8 +265,8 @@ class Application {
             //!!! Rendering Area
             //!!  Khong phan su mien vao :v
             //Clear screen
-            //SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-            //SDL_RenderClear( mRenderer );
+            SDL_SetRenderDrawColor( mRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+            SDL_RenderClear( mRenderer );
 
             Entity::renderAll(players, mRenderer);
 
@@ -278,7 +282,7 @@ class Application {
             }
             drawFPSInfo(mRenderer, fps, 20, 20, assets.defFont());
             loadIcon("push.jpg", 5 , 65 , mRenderer);
-            drawCoolDown(5 ,65 ,mRenderer , &sManager ,1 );
+            drawCoolDown(5 ,65 ,mRenderer , &sManager, 1, subTexture);
             //Demo draw from SDL2_gfx
             //filledPieRGBA(mRenderer, 200, 200, 200, 0, 70, 100, 200, 100, 255);
 
